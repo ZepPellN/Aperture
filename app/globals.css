@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #18181b;
 }
 
 @theme inline {
@@ -12,15 +12,132 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Wiki article styles */
+.wiki-article {
+  line-height: 1.75;
+  color: #27272a;
+}
+
+.wiki-article h1,
+.wiki-article h2,
+.wiki-article h3,
+.wiki-article h4 {
+  font-weight: 600;
+  color: #18181b;
+  margin-top: 1.75em;
+  margin-bottom: 0.75em;
+}
+
+.wiki-article h1 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+}
+
+.wiki-article h2 {
+  font-size: 1.375rem;
+  line-height: 1.3;
+  border-bottom: 1px solid #e4e4e7;
+  padding-bottom: 0.4em;
+}
+
+.wiki-article h3 {
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.wiki-article p {
+  margin-bottom: 1.1em;
+}
+
+.wiki-article ul,
+.wiki-article ol {
+  margin-bottom: 1.1em;
+  padding-left: 1.5em;
+}
+
+.wiki-article li {
+  margin-bottom: 0.35em;
+}
+
+.wiki-article a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.wiki-article a:hover {
+  color: #1d4ed8;
+}
+
+.wiki-article a.wikilink {
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 4px;
+  padding: 0 4px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.wiki-article a.wikilink:hover {
+  background: #dbeafe;
+}
+
+.wiki-article code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  background: #f4f4f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.wiki-article pre {
+  background: #18181b;
+  color: #fafafa;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 1.1em;
+}
+
+.wiki-article pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.wiki-article blockquote {
+  border-left: 3px solid #d4d4d8;
+  padding-left: 1em;
+  margin-left: 0;
+  color: #52525b;
+  margin-bottom: 1.1em;
+}
+
+.wiki-article hr {
+  border: 0;
+  border-top: 1px solid #e4e4e7;
+  margin: 2em 0;
+}
+
+.wiki-article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.1em;
+}
+
+.wiki-article th,
+.wiki-article td {
+  border: 1px solid #e4e4e7;
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.wiki-article th {
+  background: #f4f4f5;
+  font-weight: 600;
 }

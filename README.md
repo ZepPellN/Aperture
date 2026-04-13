@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Loom
 
-## Getting Started
+A web reader for LLM-compiled personal wikis.
 
-First, run the development server:
+Loom turns a folder of markdown wiki files into a browsable website with search, backlinks, and an interactive knowledge graph. It is designed for the **Claude Code + Obsidian** workflow where an LLM ingests raw sources and writes structured, interlinked wiki articles.
+
+---
+
+## What it does
+
+- **Article pages** — Renders markdown with YAML frontmatter, clickable `[[wikilinks]]`, table of contents, and backlinks.
+- **Knowledge graph** — Visualizes the entire wiki as an interactive network (Sigma.js).
+- **Stats dashboard** — Shows article count, link density, categories, and orphan pages.
+- **Zero-backend** — Reads markdown files at build time. Deploy anywhere that hosts static sites.
+
+---
+
+## Quick start
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/ZepPellN/loom.git
+cd loom
+npm install
+```
+
+### 2. Point to your wiki
+
+Copy the example environment file and edit it to point at your vault:
+
+```bash
+cp .env.example .env.local
+```
+
+```bash
+# .env.local
+WIKI_ROOT=/Users/jean/Documents/Obsidian Vault
+```
+
+Loom expects the target directory to contain a `wiki/` folder with markdown files.
+
+### 3. Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Build for production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+This outputs a static site to the `dist/` folder.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+loom/
+├── app/                    # Next.js App Router
+│   ├── page.tsx            # Homepage with stats and recent articles
+│   ├── graph/
+│   │   └── page.tsx        # Knowledge graph view
+│   └── wiki/
+│       └── [...slug]/      # Individual article pages
+├── components/
+│   ├── WikiLayout.tsx      # Top navigation shell
+│   ├── ArticleView.tsx     # Article renderer + backlinks
+│   └── GraphView.tsx       # Sigma.js graph component
+├── lib/
+│   ├── wiki-loader.ts      # Markdown parsing, wikilink extraction, stats
+│   └── graph-builder.ts    # Graph data generation for Sigma
+├── public/
+├── next.config.ts
+├── package.json
+└── README.md
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Assumed wiki format
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Loom works with standard markdown files that use YAML frontmatter and `[[wikilinks]]`:
+
+```markdown
+---
+title: Example Article
+section: harness-engineering
+sources: 3
+updated: 2026-04-13
+---
+
+# Example Article
+
+This is a paragraph with a [[another-article|wikilink]].
+```
+
+Articles are organized into categories by their parent directory inside `wiki/`.
+
+---
+
+## Roadmap
+
+- [x] Article rendering with wikilinks
+- [x] Backlinks
+- [x] Knowledge graph
+- [x] Stats dashboard
+- [ ] Full-text search
+- [ ] Dark mode
+- [ ] RSS feed
+
+---
+
+## License
+
+MIT
