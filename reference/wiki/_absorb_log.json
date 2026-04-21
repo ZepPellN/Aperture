@@ -1,0 +1,8 @@
+{
+  "raw/to-learn/example-article.md": {
+    "status": "absorbed",
+    "absorbed_at": "2026-04-15T10:00:00Z",
+    "wiki_pages": ["concepts/agentic-coding", "entities/claude-code"],
+    "hash": "sha256:example123"
+  }
+}

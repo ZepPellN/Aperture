@@ -1,0 +1,5 @@
+{
+  "concepts/agentic-coding": ["entities/claude-code", "forecasts/ai-coding-2026"],
+  "entities/claude-code": ["concepts/agentic-coding"],
+  "forecasts/ai-coding-2026": ["concepts/agentic-coding"]
+}

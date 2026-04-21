@@ -131,7 +131,7 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
     parsed = matter(raw);
   } catch (err) {
     // Fallback: treat entire file as content if frontmatter parsing fails
-    console.warn(`[Loom] Failed to parse frontmatter for ${slug}, using fallback.`);
+    console.warn(`[Aperture] Failed to parse frontmatter for ${slug}, using fallback.`);
     parsed = { data: {}, content: raw };
   }
 

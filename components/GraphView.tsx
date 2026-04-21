@@ -12,6 +12,12 @@ interface GraphViewProps {
   data: GraphData;
 }
 
+// Warm palette
+const WARM_BG = '#faf8f5';
+const WARM_EDGE = '#e8e0d6';
+const WARM_LABEL = '#6b5e50';
+const WARM_NODE_DEFAULT = '#c4b8a8';
+
 export default function GraphView({ data }: GraphViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
@@ -53,9 +59,9 @@ export default function GraphView({ data }: GraphViewProps) {
       renderLabels: true,
       labelSize: 12,
       labelWeight: '500',
-      labelColor: { color: '#52525b' },
-      defaultNodeColor: '#9ca3af',
-      defaultEdgeColor: '#d1d5db',
+      labelColor: { color: WARM_LABEL },
+      defaultNodeColor: WARM_NODE_DEFAULT,
+      defaultEdgeColor: WARM_EDGE,
       minCameraRatio: 0.05,
       maxCameraRatio: 2,
     });
@@ -82,34 +88,21 @@ export default function GraphView({ data }: GraphViewProps) {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-zinc-500">
-          <Link href="/" className="flex items-center gap-1 hover:text-zinc-800">
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back</span>
-          </Link>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-zinc-500">
-          <Info className="h-4 w-4" />
-          <span>Click a node to open the article</span>
-        </div>
-      </div>
-
-      <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-        <div ref={containerRef} className="h-[60vh] w-full" />
+      <div className="relative overflow-hidden rounded-2xl border border-border" style={{ background: WARM_BG }}>
+        <div ref={containerRef} className="h-[65vh] w-full" />
 
         {activeNode && (
-          <div className="absolute bottom-4 left-4 max-w-sm rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <div className="absolute bottom-4 left-4 max-w-sm rounded-xl border border-border bg-card/95 p-4 shadow-sm backdrop-blur">
             <div
               className="mb-1 inline-block rounded px-2 py-0.5 text-xs font-medium text-white"
               style={{ backgroundColor: activeNode.color }}
             >
               {activeNode.category.replace(/-/g, ' ')}
             </div>
-            <div className="text-lg font-semibold text-zinc-900">{activeNode.label}</div>
+            <div className="text-lg font-medium text-foreground">{activeNode.label}</div>
             <Link
               href={`/wiki/${activeNode.id}`}
-              className="mt-2 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="mt-2 inline-flex items-center text-sm font-medium text-primary transition-colors hover:text-accent"
             >
               Open article →
             </Link>
@@ -119,11 +112,11 @@ export default function GraphView({ data }: GraphViewProps) {
 
       <div className="mt-4 flex flex-wrap gap-3 text-sm">
         {Array.from(new Set(data.nodes.map((n) => n.category))).map((cat) => {
-          const color = data.nodes.find((n) => n.category === cat)?.color || '#9ca3af';
+          const color = data.nodes.find((n) => n.category === cat)?.color || WARM_NODE_DEFAULT;
           return (
             <div key={cat} className="flex items-center gap-1.5">
               <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-              <span className="text-zinc-600">{cat.replace(/-/g, ' ')}</span>
+              <span className="text-muted-foreground capitalize">{cat.replace(/-/g, ' ')}</span>
             </div>
           );
         })}

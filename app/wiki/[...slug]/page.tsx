@@ -19,9 +19,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: WikiPageProps) {
   const { slug } = await params;
   const article = await loadArticle(slug.join('/'));
-  if (!article) return { title: 'Not Found — Loom' };
+  if (!article) return { title: 'Not Found — Aperture' };
   return {
-    title: `${article.title} — Loom`,
+    title: `${article.title} — Aperture`,
     description: article.content.slice(0, 160),
   };
 }
