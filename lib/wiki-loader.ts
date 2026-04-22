@@ -36,7 +36,7 @@ export interface WikiLink {
 
 const WIKI_DIR = process.env.WIKI_ROOT
   ? join(process.env.WIKI_ROOT, 'wiki')
-  : join(process.cwd(), '..', 'Obsidian Vault', 'wiki');
+  : join(process.cwd(), 'reference', 'wiki');
 
 const SKIP_FILES = new Set(['index.md', 'log.md']);
 
