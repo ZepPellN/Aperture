@@ -230,7 +230,7 @@ Remove the graph route or remove the link from the navigation in `components/Wik
 
 ## Semantic Features
 
-Aperture supports semantic discovery via vector embeddings. These features require [qmd](https://github.com/ZepPellN/qmd) (Quick Markdown Search) to be installed and your wiki indexed.
+Aperture supports semantic discovery via vector embeddings. These features require [qmd](https://qmd.sh) (Quick Markdown Search) to be installed and your wiki indexed.
 
 ```bash
 # Install qmd
