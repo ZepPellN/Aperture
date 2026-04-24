@@ -1,0 +1,1130 @@
+{
+  "index": {
+    "x": 55.22972967210236,
+    "y": 61.25919154789548
+  },
+  "log": {
+    "x": 67.19826098267409,
+    "y": 41.13134600289538
+  },
+  "ai-ecosystem/overview": {
+    "x": 85.99312410735754,
+    "y": 41.555575640160484
+  },
+  "claude-code/overview": {
+    "x": 67.38266171827433,
+    "y": 17.973326056011455
+  },
+  "forecasts/overview": {
+    "x": 88.52356484955976,
+    "y": 43.262650154025536
+  },
+  "harness-engineering/aci": {
+    "x": 22.171562791028506,
+    "y": 21.35127194062302
+  },
+  "harness-engineering/anthropic-long-running": {
+    "x": 9.691103065743931,
+    "y": 67.55259508170708
+  },
+  "harness-engineering/continual-learning": {
+    "x": 15.776567834733394,
+    "y": 83.80903160942952
+  },
+  "harness-engineering/overview": {
+    "x": 9.048113262302401,
+    "y": 36.13480125599343
+  },
+  "harness-engineering/prompt-caching": {
+    "x": 20.237042187207198,
+    "y": 33.42296798566036
+  },
+  "harness-engineering/self-verification-loops": {
+    "x": 81.25110195598938,
+    "y": 37.26663428268287
+  },
+  "harness-engineering/three-scaling-dimensions": {
+    "x": 6.930015471929096,
+    "y": 70.24031749762672
+  },
+  "mental-models/overview": {
+    "x": 40.169476903656175,
+    "y": 77.58770573309894
+  },
+  "product-trends/overview": {
+    "x": 85.4072965164689,
+    "y": 51.535140593641096
+  },
+  "self/goals-tracking": {
+    "x": 85.68396718205699,
+    "y": 29.755383259424477
+  },
+  "self/overview": {
+    "x": 84.62304368852656,
+    "y": 31.84463433372112
+  },
+  "self/patterns": {
+    "x": 82.9398884505926,
+    "y": 30.742999210619015
+  },
+  "writing/overview": {
+    "x": 90.4603238001803,
+    "y": 95.27381318377552
+  },
+  "ai-tools/claude-health": {
+    "x": 62.08371036715795,
+    "y": 24.82394507472973
+  },
+  "ai-tools/codex-memory-extensions": {
+    "x": 13.753178967160059,
+    "y": 27.3097992101539
+  },
+  "ai-tools/context7-cli": {
+    "x": 39.328804457681905,
+    "y": 34.781494014309004
+  },
+  "ai-tools/cookey-agent-cookie": {
+    "x": 97.71989723169958,
+    "y": 30.331036610666544
+  },
+  "ai-tools/gemini-workspace-tutorial": {
+    "x": 59.66685375659202,
+    "y": 49.72125428786627
+  },
+  "ai-tools/gitbutler": {
+    "x": 75.1489133364132,
+    "y": 0
+  },
+  "ai-tools/listenhub-cli": {
+    "x": 38.8054751564995,
+    "y": 18.60287535439348
+  },
+  "ai-tools/mario-claude-chrome-extension": {
+    "x": 36.71212139528065,
+    "y": 28.998034513404008
+  },
+  "ai-tools/openclaw-settings": {
+    "x": 35.60998695818919,
+    "y": 49.312497847726725
+  },
+  "ai-tools/overview": {
+    "x": 42.001389930089545,
+    "y": 26.143232642039383
+  },
+  "ai-tools/podwise-cli": {
+    "x": 60.828532670063936,
+    "y": 19.615359105749427
+  },
+  "ai-tools/public-apis": {
+    "x": 68.68733829942596,
+    "y": 47.62726430810346
+  },
+  "ai-tools/review-swarm": {
+    "x": 81.52170000859394,
+    "y": 15.065672184727052
+  },
+  "ai-tools/twitter-blocklist": {
+    "x": 81.46969281055364,
+    "y": 17.162891439031707
+  },
+  "ai-tools/twitter-cli": {
+    "x": 46.22075687334007,
+    "y": 15.752205572505746
+  },
+  "forecasts/altair-basic-era-ai": {
+    "x": 77.06880125539924,
+    "y": 70.26184218251316
+  },
+  "forecasts/jevons-paradox-ai-scope-expansion": {
+    "x": 49.74238031129294,
+    "y": 97.61691466081543
+  },
+  "forecasts/last-4-jobs-in-tech": {
+    "x": 88.317756700805,
+    "y": 45.62441801688788
+  },
+  "forecasts/one-person-billion-dollar-company": {
+    "x": 77.66022710616728,
+    "y": 72.51954512603427
+  },
+  "forecasts/post-labor-economics": {
+    "x": 75.41432701062006,
+    "y": 95.71536936244328
+  },
+  "forecasts/sam-altman-social-contract-ai": {
+    "x": 99.34571530090459,
+    "y": 28.635613970007125
+  },
+  "forecasts/stanford-ai-index-2026": {
+    "x": 73.47487643797281,
+    "y": 92.34523312669836
+  },
+  "ai-ecosystem/ai-builders-digest-2025-03-18": {
+    "x": 60.48037015629066,
+    "y": 47.80869520863784
+  },
+  "ai-ecosystem/ai-data-licensing-market": {
+    "x": 89.98215759481923,
+    "y": 56.73528983234816
+  },
+  "ai-ecosystem/ai-doomer-ideology-violence": {
+    "x": 95.4464667028792,
+    "y": 40.16035574364378
+  },
+  "ai-ecosystem/ai-inference-rationing-2026": {
+    "x": 73.3505245970936,
+    "y": 57.5810803426848
+  },
+  "ai-ecosystem/ai-labs-devtools-acquisition": {
+    "x": 19.552879578926568,
+    "y": 56.77744448180112
+  },
+  "ai-ecosystem/ai-security-reports-surge": {
+    "x": 99.79695186704244,
+    "y": 64.24715090351233
+  },
+  "ai-ecosystem/andon-labs-luna-retail-agent": {
+    "x": 97.59704829426845,
+    "y": 26.724877234276345
+  },
+  "ai-ecosystem/anthropic-ai-accelerated-offense": {
+    "x": 96.8999661925269,
+    "y": 57.0622020117211
+  },
+  "ai-ecosystem/anthropic-mythos-security-audit": {
+    "x": 96.2042717245826,
+    "y": 66.04967596326738
+  },
+  "ai-ecosystem/anthropic-mythos": {
+    "x": 100,
+    "y": 58.62169209663227
+  },
+  "ai-ecosystem/autonomous-labs": {
+    "x": 85.63965414099972,
+    "y": 82.0679458088612
+  },
+  "ai-ecosystem/builder-2-collaborative-coding": {
+    "x": 55.84331068280315,
+    "y": 52.375264803182844
+  },
+  "ai-ecosystem/chinese-ai-work-culture": {
+    "x": 99.52480576205245,
+    "y": 26.075459903209914
+  },
+  "ai-ecosystem/claude-81000-survey": {
+    "x": 66.66891722027736,
+    "y": 57.90080322367399
+  },
+  "ai-ecosystem/cursor-composer-2": {
+    "x": 33.515470887781575,
+    "y": 73.85576677816917
+  },
+  "ai-ecosystem/dorsey-ai-replaces-managers": {
+    "x": 83.43637032567818,
+    "y": 21.067651608872602
+  },
+  "ai-ecosystem/gary-marcus-neurosymbolic-claude-code": {
+    "x": 80.95551603685752,
+    "y": 76.168385489089
+  },
+  "ai-ecosystem/gemini-31-pro-benchmarks": {
+    "x": 86.52352736148131,
+    "y": 57.72214487671823
+  },
+  "ai-ecosystem/gemma-4": {
+    "x": 66.19160221940923,
+    "y": 38.84724680060553
+  },
+  "ai-ecosystem/ginkgo-autonomous-lab-biopharma": {
+    "x": 86.07631502706832,
+    "y": 78.68536953866094
+  },
+  "ai-ecosystem/ginkgo-autonomous-lab": {
+    "x": 85.35345319854338,
+    "y": 82.09599137770223
+  },
+  "ai-ecosystem/google-workspace-cli": {
+    "x": 45.80135970995617,
+    "y": 58.358765958087254
+  },
+  "ai-ecosystem/graphify-karpathy-knowledge-base": {
+    "x": 60.15806594970565,
+    "y": 30.493404710983363
+  },
+  "ai-ecosystem/h100-price-surge": {
+    "x": 73.48987096449996,
+    "y": 20.220812752363795
+  },
+  "ai-ecosystem/hermes-agent": {
+    "x": 79.47046426609992,
+    "y": 3.8644732183757213
+  },
+  "ai-ecosystem/local-models-april-2026": {
+    "x": 49.2465734915755,
+    "y": 59.61162544090157
+  },
+  "ai-ecosystem/marc-andreessen-latent-space-2026-04": {
+    "x": 84.64650599505978,
+    "y": 43.38348950068144
+  },
+  "ai-ecosystem/meta-muse-spark": {
+    "x": 92.67142288956202,
+    "y": 49.853713025222234
+  },
+  "ai-ecosystem/minimax-m27-self-evolving-model": {
+    "x": 23.801448010518257,
+    "y": 69.41785849599657
+  },
+  "ai-ecosystem/mistral-voxtral-forge": {
+    "x": 39.141870572212525,
+    "y": 63.37869585653549
+  },
+  "ai-ecosystem/multimodal-search-analysis": {
+    "x": 94.16124931702305,
+    "y": 67.45126658697536
+  },
+  "ai-ecosystem/nikunj-kothari-anthropic-revenue": {
+    "x": 81.44286097943642,
+    "y": 59.3212731625362
+  },
+  "ai-ecosystem/npm-axios-supply-chain-attack": {
+    "x": 95.94728923553045,
+    "y": 32.377391445334155
+  },
+  "ai-ecosystem/openai-122b-funding": {
+    "x": 78.77963860801647,
+    "y": 56.29379653785648
+  },
+  "ai-ecosystem/openai-codex-superapp": {
+    "x": 43.52056511016063,
+    "y": 25.63879509087813
+  },
+  "ai-ecosystem/openai-disney-sora-blindside": {
+    "x": 84.68500095901378,
+    "y": 56.35047475903615
+  },
+  "ai-ecosystem/openai-rl-beyond-code": {
+    "x": 15.790330146699358,
+    "y": 81.23152879902837
+  },
+  "ai-ecosystem/periodic-labs-ai-for-atoms": {
+    "x": 78.76661767834578,
+    "y": 73.86958771692119
+  },
+  "ai-ecosystem/pretraining-parallelisms-dwarkesh": {
+    "x": 7.846045242843276,
+    "y": 50.48174999696434
+  },
+  "ai-ecosystem/project-glasswing": {
+    "x": 99.43718722025842,
+    "y": 62.31953506878052
+  },
+  "ai-ecosystem/snap-spectacles-ar-glasses": {
+    "x": 86.66562082996016,
+    "y": 53.89208729317265
+  },
+  "ai-ecosystem/swyx-prompt-injection-naming": {
+    "x": 92.20312916467483,
+    "y": 65.10601984476276
+  },
+  "ai-ecosystem/the-rundown-2026-03-19": {
+    "x": 84.09753010990019,
+    "y": 60.200423347720054
+  },
+  "mental-models/ai-capability-gap": {
+    "x": 79.1398200102887,
+    "y": 59.319582238192346
+  },
+  "mental-models/ai-wisdom-gap": {
+    "x": 75.51983440826969,
+    "y": 88.34175877035901
+  },
+  "harness-engineering/9-layer-production-ai-architecture": {
+    "x": 20.133601710785516,
+    "y": 50.09874461065987
+  },
+  "harness-engineering/advisor-pattern": {
+    "x": 25.00010181865357,
+    "y": 51.43826496656801
+  },
+  "harness-engineering/agent-architecture-unsentimental": {
+    "x": 22.492058260694094,
+    "y": 78.44125362587064
+  },
+  "harness-engineering/agent-in-loop-methodology": {
+    "x": 9.777161055223626,
+    "y": 62.88486519034914
+  },
+  "harness-engineering/agent-memory-vs-context-substrate": {
+    "x": 27.184702993549024,
+    "y": 53.24676659960027
+  },
+  "harness-engineering/agentic-infrastructure": {
+    "x": 24.89301795407051,
+    "y": 73.66998649154918
+  },
+  "harness-engineering/agentic-software-is-systems-engineering": {
+    "x": 0.3627880292337592,
+    "y": 61.57431777870115
+  },
+  "harness-engineering/ai-native-dev-tencent-openspec": {
+    "x": 45.462523520967565,
+    "y": 54.234496548187686
+  },
+  "harness-engineering/ai-security-speed-mismatch": {
+    "x": 98.64285810596428,
+    "y": 62.73864444474807
+  },
+  "harness-engineering/bespoke-clis-for-codex": {
+    "x": 44.10355029016147,
+    "y": 21.216653855636423
+  },
+  "harness-engineering/big-systems-advice": {
+    "x": 30.9203428209483,
+    "y": 60.620144011277254
+  },
+  "harness-engineering/browser-harness": {
+    "x": 16.098592517684526,
+    "y": 68.98791045367045
+  },
+  "harness-engineering/build-agent-framework-from-scratch": {
+    "x": 27.294069508983217,
+    "y": 51.39199894193468
+  },
+  "harness-engineering/claude-managed-agents-launch": {
+    "x": 31.84401559700466,
+    "y": 34.56705891509607
+  },
+  "harness-engineering/cloudflare-sandboxes": {
+    "x": 12.483281585054149,
+    "y": 45.12022759567521
+  },
+  "harness-engineering/components-coding-agent-detailed": {
+    "x": 16.75804918240019,
+    "y": 41.01969966527414
+  },
+  "harness-engineering/components-coding-agent": {
+    "x": 12.483828487240775,
+    "y": 57.60819855079835
+  },
+  "harness-engineering/compound-engineering": {
+    "x": 4.54251974488986,
+    "y": 34.34377920647875
+  },
+  "harness-engineering/context-rot-companionship": {
+    "x": 81.28284513500849,
+    "y": 88.96627205755998
+  },
+  "harness-engineering/context-rot": {
+    "x": 36.31661611854312,
+    "y": 52.9324256392572
+  },
+  "harness-engineering/continual-learning-layers": {
+    "x": 14.407372859180475,
+    "y": 50.71117361741836
+  },
+  "harness-engineering/copilot-vs-delegate": {
+    "x": 3.2533908237841707,
+    "y": 64.76127358692705
+  },
+  "harness-engineering/creative-work-like-programming": {
+    "x": 71.00757233215681,
+    "y": 36.69615915506293
+  },
+  "harness-engineering/dan-shipper-specialization-context-rot": {
+    "x": 94.52453122067237,
+    "y": 31.118348984576777
+  },
+  "harness-engineering/dhh-agentic-engineering": {
+    "x": 30.52371367779291,
+    "y": 79.81229707324601
+  },
+  "harness-engineering/extreme-harness-engineering-token-billionaires": {
+    "x": 78.17354371847625,
+    "y": 61.74128061261295
+  },
+  "harness-engineering/factory-missions-architecture": {
+    "x": 32.046401556697525,
+    "y": 69.94895700425133
+  },
+  "harness-engineering/fat-skills-fat-code-thin-harness": {
+    "x": 77.92287510729096,
+    "y": 5.269165071296097
+  },
+  "harness-engineering/file-as-bus-pattern": {
+    "x": 10.774908028933563,
+    "y": 63.63579898237896
+  },
+  "harness-engineering/folder-is-the-agent": {
+    "x": 9.580147412764997,
+    "y": 55.09081435438533
+  },
+  "harness-engineering/google-agent-skill-patterns": {
+    "x": 55.21329342770094,
+    "y": 45.474369391492544
+  },
+  "harness-engineering/harness-is-everything-detailed": {
+    "x": 16.803621211160632,
+    "y": 66.79180126274915
+  },
+  "harness-engineering/harness-memory-bitter-lesson": {
+    "x": 5.915219388426776,
+    "y": 41.405694241650664
+  },
+  "harness-engineering/harness-optimization-guide": {
+    "x": 14.535300597605383,
+    "y": 65.13876205547172
+  },
+  "harness-engineering/harness-steering-orchestration-2026-04": {
+    "x": 14.564242259532135,
+    "y": 61.81632692409897
+  },
+  "harness-engineering/headless-mac-mini-setup": {
+    "x": 38.76852314762846,
+    "y": 53.23688013132977
+  },
+  "harness-engineering/infrastructure-noise-agentic-coding": {
+    "x": 0,
+    "y": 59.66955944681788
+  },
+  "harness-engineering/lightweight-vs-orchestration-harness": {
+    "x": 70.9025852019075,
+    "y": 11.196898380019412
+  },
+  "harness-engineering/llm-training-pipeline-2026": {
+    "x": 4.6866595153701995,
+    "y": 47.77237257923329
+  },
+  "harness-engineering/managed-agents-architecture": {
+    "x": 15.011283762878715,
+    "y": 47.42626873037768
+  },
+  "harness-engineering/memory-as-trajectories": {
+    "x": 57.31904639565616,
+    "y": 42.18566253079748
+  },
+  "harness-engineering/model-routing": {
+    "x": 95.76351398396098,
+    "y": 30.818470981586465
+  },
+  "harness-engineering/model-spikiness": {
+    "x": 19.97896106698025,
+    "y": 41.85818023881626
+  },
+  "harness-engineering/multi-agent-coordination-patterns": {
+    "x": 5.370169153550555,
+    "y": 38.024287477701044
+  },
+  "harness-engineering/multica-autopilot": {
+    "x": 16.333793740943996,
+    "y": 55.381018472989894
+  },
+  "harness-engineering/nasa-artemis-fault-tolerant-computer": {
+    "x": 22.15443170921944,
+    "y": 66.66427259038021
+  },
+  "harness-engineering/notion-ai-agents": {
+    "x": 51.08647807306854,
+    "y": 77.11098360118683
+  },
+  "harness-engineering/openai-frontier-symphony": {
+    "x": 27.585130600433615,
+    "y": 60.89721401305441
+  },
+  "harness-engineering/openclaw-clawchief": {
+    "x": 34.71546837482563,
+    "y": 55.11222199212371
+  },
+  "harness-engineering/parallel-learning-internal-agent": {
+    "x": 53.68105578970136,
+    "y": 81.6941274109184
+  },
+  "harness-engineering/portable-agents-adward28": {
+    "x": 28.197134627903313,
+    "y": 58.58329141194301
+  },
+  "harness-engineering/quantization-turboquant-rotorquant": {
+    "x": 76.27155323125612,
+    "y": 43.328314175816836
+  },
+  "harness-engineering/ralph-harness-framework": {
+    "x": 11.393839089401837,
+    "y": 61.01378489833882
+  },
+  "harness-engineering/resolvers": {
+    "x": 17.743475523524886,
+    "y": 59.40276211634742
+  },
+  "harness-engineering/rip-pull-requests": {
+    "x": 60.93660075555564,
+    "y": 53.74894433268673
+  },
+  "harness-engineering/simon-willison-dark-factory": {
+    "x": 57.63273056743141,
+    "y": 62.07700433871706
+  },
+  "harness-engineering/six-self-improvement-paths": {
+    "x": 8.25455126847131,
+    "y": 54.52572618341599
+  },
+  "harness-engineering/skills-into-loops": {
+    "x": 17.24680571274231,
+    "y": 54.04618969411933
+  },
+  "harness-engineering/systems-engineering-agentic": {
+    "x": 1.0143643760129784,
+    "y": 61.65360323850765
+  },
+  "harness-engineering/vercel-workflows": {
+    "x": 23.680313838821174,
+    "y": 62.84749965478855
+  },
+  "harness-engineering/vibe-coding-real-cost": {
+    "x": 59.68298829018819,
+    "y": 78.9149681983166
+  },
+  "harness-engineering/what-is-agent-harness": {
+    "x": 19.602341765429117,
+    "y": 54.93484917415654
+  },
+  "harness-engineering/your-harness-your-memory": {
+    "x": 8.335807924826561,
+    "y": 34.520369875752436
+  },
+  "harness-engineering/yoyo-harness-engineering-practice": {
+    "x": 78.43239827959955,
+    "y": 4.061511463380414
+  },
+  "claude-code/300-claude-prompts": {
+    "x": 67.12886387824246,
+    "y": 47.31724610269074
+  },
+  "claude-code/awesome-design-skill": {
+    "x": 51.03087053883415,
+    "y": 34.28334729158324
+  },
+  "claude-code/building-skills-best-practices": {
+    "x": 43.291359158805356,
+    "y": 39.02158066424474
+  },
+  "claude-code/caspar-b-superpowers-skills": {
+    "x": 57.14607977958277,
+    "y": 37.565087776721036
+  },
+  "claude-code/claude-agent-mckay-wrigley": {
+    "x": 65.81945244376422,
+    "y": 35.558965775424994
+  },
+  "claude-code/claude-code-architecture-analysis": {
+    "x": 29.908160207247253,
+    "y": 50.356868171028125
+  },
+  "claude-code/claude-code-routines": {
+    "x": 26.2302917995186,
+    "y": 36.21997428037337
+  },
+  "claude-code/claude-cowork-felix-rieseberg": {
+    "x": 67.17930653598822,
+    "y": 59.4608726547288
+  },
+  "claude-code/claude-folder-production-agent": {
+    "x": 29.76633744699179,
+    "y": 38.8173284289688
+  },
+  "claude-code/claude-for-word": {
+    "x": 51.65418787136792,
+    "y": 18.927513078987708
+  },
+  "claude-code/claude-managed-agents-cookbook": {
+    "x": 30.379686812263433,
+    "y": 41.96310446824623
+  },
+  "claude-code/claude-obsidian-integration": {
+    "x": 57.51577647719601,
+    "y": 29.794144602195278
+  },
+  "claude-code/claude-opus-47-migration-moves": {
+    "x": 69.61541873613531,
+    "y": 27.465383341609755
+  },
+  "claude-code/cli-creator-codex": {
+    "x": 40.944154330967585,
+    "y": 21.28672544492889
+  },
+  "claude-code/context-window-optimization": {
+    "x": 75.35413887270302,
+    "y": 17.926602110191244
+  },
+  "claude-code/cursor-3-glass-philosophy": {
+    "x": 44.9188765285067,
+    "y": 69.61840196316966
+  },
+  "claude-code/dynamic-context-injection": {
+    "x": 40.741293016278604,
+    "y": 39.48846335502997
+  },
+  "claude-code/extending-claude-sessions": {
+    "x": 53.97841933873706,
+    "y": 31.104588093939668
+  },
+  "claude-code/fireworks-tech-graph": {
+    "x": 51.230467835459095,
+    "y": 42.151589053775695
+  },
+  "claude-code/harnessing-claude-intelligence": {
+    "x": 53.60532361398219,
+    "y": 17.467468910602165
+  },
+  "claude-code/jerry-liu-research-skill": {
+    "x": 59.676062183249854,
+    "y": 29.57837319302116
+  },
+  "claude-code/karpathy-nopriors-qa": {
+    "x": 4.108521341464351,
+    "y": 61.82961870503407
+  },
+  "claude-code/leaked-files": {
+    "x": 16.74993296789212,
+    "y": 26.206724462701775
+  },
+  "claude-code/lessons-building-skills": {
+    "x": 48.900465757618186,
+    "y": 43.272984373342254
+  },
+  "claude-code/llm-wiki-pattern": {
+    "x": 60.75222888192631,
+    "y": 33.09924950266234
+  },
+  "claude-code/paseo-remote-development": {
+    "x": 28.36665394469822,
+    "y": 32.675722483431585
+  },
+  "claude-code/pawelhuryn-claude-decision-engine": {
+    "x": 50.64225635410823,
+    "y": 28.441970063003797
+  },
+  "claude-code/prompting-as-skill": {
+    "x": 24.533555986280845,
+    "y": 25.89438526055868
+  },
+  "claude-code/session-management-guide": {
+    "x": 67.26236278127077,
+    "y": 14.900738251283746
+  },
+  "claude-code/skills-collection": {
+    "x": 46.741739288097165,
+    "y": 34.42232905060125
+  },
+  "claude-code/source-leak-memory-architecture": {
+    "x": 14.656373111983708,
+    "y": 30.03269636701328
+  },
+  "claude-code/source-leak-technical-analysis": {
+    "x": 19.42830807294096,
+    "y": 27.733880086795214
+  },
+  "claude-code/syntaqlite-ai-build-experience": {
+    "x": 65.24600501364444,
+    "y": 68.85001799566167
+  },
+  "claude-code/thariq-claude-code-tuning": {
+    "x": 93.61420746252071,
+    "y": 34.871736516436904
+  },
+  "claude-code/token-optimization-toolkit": {
+    "x": 68.31311675830152,
+    "y": 31.093610516954328
+  },
+  "claude-code/ultraplan": {
+    "x": 48.70047838358545,
+    "y": 19.086564664794224
+  },
+  "claude-code/useful-usage-patterns": {
+    "x": 52.596210311700744,
+    "y": 31.272188735870287
+  },
+  "claude-code/using-on-phone": {
+    "x": 39.103583597402974,
+    "y": 44.388603120785014
+  },
+  "claude-code/what-makes-good-agents-md": {
+    "x": 31.1857821063072,
+    "y": 34.46063265334726
+  },
+  "product-trends/27-days-agent-system": {
+    "x": 35.02581123754279,
+    "y": 38.09503941562644
+  },
+  "product-trends/aaron-levie-agent-deployer-role": {
+    "x": 37.10937767735954,
+    "y": 89.16767031864923
+  },
+  "product-trends/aaron-levie-agents-move-work-up": {
+    "x": 98.31526084823291,
+    "y": 29.83854478302057
+  },
+  "product-trends/aaron-levie-ai-architecture-churn": {
+    "x": 47.09257928585259,
+    "y": 95.23583561196342
+  },
+  "product-trends/agent-native-architecture-three-principles": {
+    "x": 33.57539962915115,
+    "y": 66.11031999079549
+  },
+  "product-trends/agent-native-architecture": {
+    "x": 27.840170052188608,
+    "y": 73.86975690151678
+  },
+  "product-trends/ai-app-never-go-viral": {
+    "x": 77.69704540915275,
+    "y": 90.18742582370203
+  },
+  "product-trends/ai-boring-businesses-moat": {
+    "x": 74.13941958552667,
+    "y": 78.44655399253078
+  },
+  "product-trends/ai-consumes-time": {
+    "x": 71.02562166140257,
+    "y": 95.06600990482386
+  },
+  "product-trends/ai-driven-layoffs-2026": {
+    "x": 81.83545719597478,
+    "y": 47.086013215776646
+  },
+  "product-trends/ai-era-pm-playbook": {
+    "x": 61.05886376176595,
+    "y": 98.40531699674918
+  },
+  "product-trends/ai-first-strategy-creao": {
+    "x": 58.14582641211914,
+    "y": 86.45625561777366
+  },
+  "product-trends/ai-founder-guide-to-taste": {
+    "x": 74.55224932993907,
+    "y": 93.73459571329327
+  },
+  "product-trends/ai-hyper-personalization-system": {
+    "x": 79.18433646901532,
+    "y": 3.9257260100270504
+  },
+  "product-trends/ai-native-saas-disruption": {
+    "x": 75.97649421694935,
+    "y": 79.50318545666487
+  },
+  "product-trends/ai-pm-onboarding-april-01": {
+    "x": 61.002504211690436,
+    "y": 94.7002074104039
+  },
+  "product-trends/ai-pm-onboarding": {
+    "x": 60.31254003305999,
+    "y": 95.74705727719254
+  },
+  "product-trends/ai-strategy-starts-at-top": {
+    "x": 65.3915075250134,
+    "y": 89.86269913776816
+  },
+  "product-trends/board-games-teach-ai-collaboration": {
+    "x": 65.81123227589492,
+    "y": 88.71278125029971
+  },
+  "product-trends/build-bloomberg-terminal-ai": {
+    "x": 61.81451793887558,
+    "y": 70.88192604156153
+  },
+  "product-trends/claw-four-interaction-modes": {
+    "x": 61.115052514333065,
+    "y": 57.84928016183556
+  },
+  "product-trends/cli-as-agent-interface": {
+    "x": 76.72712457749087,
+    "y": 14.371035733916862
+  },
+  "product-trends/cli-tools-peek-inside": {
+    "x": 32.38967551497772,
+    "y": 24.242449122339078
+  },
+  "product-trends/clienteling-context-timing": {
+    "x": 63.77664163279403,
+    "y": 86.87817997894824
+  },
+  "product-trends/codex-team-methodology": {
+    "x": 44.438764069583605,
+    "y": 36.304496069801445
+  },
+  "product-trends/computer-use-agent-explosion": {
+    "x": 49.56646247151755,
+    "y": 23.97534090701593
+  },
+  "product-trends/cursor-3-agent-first": {
+    "x": 42.004084671611466,
+    "y": 67.09094481455827
+  },
+  "product-trends/cursor-3-agent-orchestration": {
+    "x": 42.76723058601009,
+    "y": 68.59413854949663
+  },
+  "product-trends/design-is-understanding-not-output": {
+    "x": 64.51645654433909,
+    "y": 12.418373152928902
+  },
+  "product-trends/design-software-with-weight": {
+    "x": 77.4782482677457,
+    "y": 26.612154563994817
+  },
+  "product-trends/devrel-judgment-cultivation": {
+    "x": 69.058227785894,
+    "y": 84.60445063195027
+  },
+  "product-trends/domain-expert-claude-code": {
+    "x": 61.991442745697455,
+    "y": 77.87157123367618
+  },
+  "product-trends/dreamer-platform-personal-agent": {
+    "x": 41.43916387249143,
+    "y": 60.375035325507774
+  },
+  "product-trends/enterprise-agent-adoption-2026-04": {
+    "x": 87.7268343741313,
+    "y": 51.34303303595954
+  },
+  "product-trends/enterprise-automation-demand": {
+    "x": 37.406411366769774,
+    "y": 86.3282579467841
+  },
+  "product-trends/enterprise-workflow-redesign": {
+    "x": 45.21148847427982,
+    "y": 93.67365453650127
+  },
+  "product-trends/every-notion-ai-agents": {
+    "x": 60.282994979738845,
+    "y": 84.40577779344983
+  },
+  "product-trends/everyone-gets-sidekick": {
+    "x": 76.207640301826,
+    "y": 75.69398423106115
+  },
+  "product-trends/fieldtheory-twitter-data-cli": {
+    "x": 55.48371870429951,
+    "y": 16.22671435038455
+  },
+  "product-trends/figma-mcp-claude-code": {
+    "x": 60.87380955521976,
+    "y": 26.495797939931393
+  },
+  "product-trends/five-ai-agents-group-chat": {
+    "x": 71.52333887464087,
+    "y": 79.15201183478983
+  },
+  "product-trends/garry-tan-distribution-security-tension": {
+    "x": 50.65602047332478,
+    "y": 53.249560193526904
+  },
+  "product-trends/google-stitch-design": {
+    "x": 82.58579380346339,
+    "y": 43.68275223759824
+  },
+  "product-trends/granola-ai-meeting-notes": {
+    "x": 59.85609811855744,
+    "y": 80.52648720151008
+  },
+  "product-trends/gstack-garry-tan-brain": {
+    "x": 71.37338836900459,
+    "y": 79.13477708006059
+  },
+  "product-trends/headless-mode-survival-requirement": {
+    "x": 30.914330855538473,
+    "y": 78.93210845373684
+  },
+  "product-trends/human-agent-interaction": {
+    "x": 34.40559018620633,
+    "y": 43.55932907200321
+  },
+  "product-trends/intent-by-discovery-ux": {
+    "x": 70.23840922118735,
+    "y": 92.5800567715982
+  },
+  "product-trends/living-software-framework": {
+    "x": 38.96042003811655,
+    "y": 77.52791900364721
+  },
+  "product-trends/mid-developer-trap": {
+    "x": 40.76037590429268,
+    "y": 46.763367348955335
+  },
+  "product-trends/notion-custom-agents": {
+    "x": 36.91275373471442,
+    "y": 66.68441139227807
+  },
+  "product-trends/nvidia-loves-openclaw": {
+    "x": 55.751555006584276,
+    "y": 37.27918825450637
+  },
+  "product-trends/obsidian-reader": {
+    "x": 63.84284765650424,
+    "y": 35.32793694343696
+  },
+  "product-trends/openclaw-five-principles": {
+    "x": 44.96317426907273,
+    "y": 52.18852598339004
+  },
+  "product-trends/openclaw-getting-started": {
+    "x": 61.40269902366756,
+    "y": 50.594844962630724
+  },
+  "product-trends/openclaw-pool-marketing-automation": {
+    "x": 68.56051531036897,
+    "y": 69.61557586732329
+  },
+  "product-trends/org-design-ai-age": {
+    "x": 63.28003434961098,
+    "y": 96.80925109002993
+  },
+  "product-trends/parasite-fallacy": {
+    "x": 42.86932689866429,
+    "y": 81.22984672044181
+  },
+  "product-trends/peter-yang-ai-agents-knowledge-work": {
+    "x": 48.72202338400361,
+    "y": 89.3622375606982
+  },
+  "product-trends/pirate-and-architect-2026": {
+    "x": 79.87881249406793,
+    "y": 48.58826964262654
+  },
+  "product-trends/pm-role-bifurcation-ai-era": {
+    "x": 73.14078179798477,
+    "y": 15.749090214106676
+  },
+  "product-trends/ramp-ai-adoption-playbook": {
+    "x": 67.50929532501358,
+    "y": 78.16162550084096
+  },
+  "product-trends/responsible-agenting": {
+    "x": 33.842599837190534,
+    "y": 69.22169512104273
+  },
+  "product-trends/saas-extinction": {
+    "x": 32.63756491437125,
+    "y": 83.62311133926703
+  },
+  "product-trends/saas-vs-agent-native": {
+    "x": 51.755979138374144,
+    "y": 62.359790316309635
+  },
+  "product-trends/saastr-10-ai-agent-mistakes": {
+    "x": 48.23031409141952,
+    "y": 84.77128004288117
+  },
+  "product-trends/services-new-software": {
+    "x": 52.07207288479415,
+    "y": 92.25169918134515
+  },
+  "product-trends/seven-things-companies-use-ai": {
+    "x": 61.065456247229,
+    "y": 83.5642939594581
+  },
+  "product-trends/software-soul-ai-slop": {
+    "x": 67.38171824946284,
+    "y": 64.71984747204492
+  },
+  "product-trends/token-optimization-economics": {
+    "x": 70.94059359355965,
+    "y": 64.21463752837151
+  },
+  "product-trends/twitter-bookmarks-action-items": {
+    "x": 63.69294982085057,
+    "y": 45.62728255131895
+  },
+  "product-trends/vercel-autonomous-design": {
+    "x": 39.91714101223,
+    "y": 72.03359560993225
+  },
+  "product-trends/vercel-open-agents": {
+    "x": 29.442193667639984,
+    "y": 78.16931072089766
+  },
+  "product-trends/vibe-coding-market-dynamics": {
+    "x": 66.9325391124178,
+    "y": 10.304992188770271
+  },
+  "product-trends/vibecoding-success-stories": {
+    "x": 65.36217575150319,
+    "y": 74.93620597705748
+  },
+  "product-trends/windsurf-2-agent-command-center": {
+    "x": 26.212790281496094,
+    "y": 37.80606634010115
+  },
+  "product-trends/your-claw-yourself": {
+    "x": 62.924526815992245,
+    "y": 63.84678437037746
+  },
+  "product-trends/zara-zhang-product-scope": {
+    "x": 52.1256556186385,
+    "y": 63.616899041782936
+  },
+  "self/how-i-became-technical-af": {
+    "x": 47.617477407404884,
+    "y": 46.91288554364289
+  },
+  "self/onboarding-prompt-ai-personalization": {
+    "x": 62.57651122040042,
+    "y": 42.61831546151137
+  },
+  "writing/ai-style-guide": {
+    "x": 83.93773334278531,
+    "y": 100
+  },
+  "writing/ai-writing-science": {
+    "x": 85.53046896976572,
+    "y": 98.9695925895139
+  },
+  "writing/editing-ai-writing": {
+    "x": 89.08450024213404,
+    "y": 96.23791162008234
+  },
+  "writing/every-editorial-team-ai-workflow": {
+    "x": 78.69143090353117,
+    "y": 94.74627964594585
+  },
+  "writing/four-hour-workweek-why-take-job": {
+    "x": 74.80094262358044,
+    "y": 87.72261111292485
+  },
+  "writing/writing-as-thinking": {
+    "x": 86.53818451878416,
+    "y": 98.6984668861389
+  },
+  "writing/writing-with-ai": {
+    "x": 86.46779935226459,
+    "y": 98.093422197411
+  },
+  "ai-ecosystem/crabtrap-agent-security-proxy": {
+    "x": 14.898461130345344,
+    "y": 45.426057204107366
+  },
+  "ai-ecosystem/image-agent-concept": {
+    "x": 75.41022686708652,
+    "y": 47.98240045801885
+  },
+  "claude-code/exec-second-brain-ryan-wiggins": {
+    "x": 49.071991186655254,
+    "y": 53.845000104667484
+  },
+  "harness-engineering/agent-harness-engineering-addy-osmani": {
+    "x": 7.806870142200414,
+    "y": 58.34938437342099
+  },
+  "harness-engineering/static-analysis-llm-synergy": {
+    "x": 22.117349368763367,
+    "y": 64.04374308254131
+  },
+  "product-trends/mercury-mcp-case-study": {
+    "x": 36.4160174475114,
+    "y": 54.79788379308188
+  },
+  "product-trends/vercel-security-investigation-2026": {
+    "x": 78.9025650053652,
+    "y": 3.57559356879203
+  }
+}

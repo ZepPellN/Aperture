@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, X } from 'lucide-react';
+import { formatCategory } from '@/lib/utils';
 
 interface SearchEntry {
   slug: string;
@@ -71,7 +72,7 @@ export default function SearchBar({ entries }: SearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
-          className="flex-1 bg-transparent text-sm font-normal outline-none placeholder:text-muted-foreground/70 placeholder:font-light"
+          className="flex-1 bg-transparent text-sm font-normal outline-none placeholder:text-muted-foreground/70 placeholder:font-light focus-ring"
         />
         {query && (
           <button
@@ -104,8 +105,8 @@ export default function SearchBar({ entries }: SearchBarProps) {
                         <Highlight text={entry.summary} query={query} />
                       </p>
                     )}
-                    <div className="mt-1 text-xs text-muted-foreground/70 capitalize">
-                      {entry.category.replace(/-/g, ' ')}
+                    <div className="mt-1 text-xs text-muted-foreground/70">
+                      {formatCategory(entry.category)}
                     </div>
                   </div>
                 </Link>

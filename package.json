@@ -5,10 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:semantic": "tsx scripts/build-semantic.ts",
     "start": "next start",
     "lint": "eslint -c .config/eslint.config.mjs"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.0",
     "d3-contour": "^4.0.2",
     "d3-geo": "^3.1.1",
     "d3-scale": "^4.0.2",
@@ -26,6 +29,8 @@
     "remark-gfm": "^4.0.1",
     "remark-rehype": "^11.1.2",
     "sigma": "^3.0.2",
+    "simplex-noise": "^4.0.3",
+    "three": "^0.184.0",
     "unified": "^11.0.5"
   },
   "devDependencies": {
@@ -33,9 +38,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.184.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "umap-js": "^1.4.0"
   }
 }

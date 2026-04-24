@@ -15,7 +15,7 @@ function formatDate(date: Date): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  }).toUpperCase();
+  });
 }
 
 export default function Greeting() {

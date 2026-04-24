@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { X, ArrowUpRight } from 'lucide-react';
+import { formatCategory } from '@/lib/utils';
 
 interface OverlayEntry {
   slug: string;
@@ -34,7 +35,7 @@ export default function CategoryOverlay({
     };
   }, [onClose]);
 
-  const displayName = category.replace(/-/g, ' ');
+  const displayName = formatCategory(category);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center bg-background/80 backdrop-blur-sm p-4 pt-16 sm:pt-24"
@@ -47,7 +48,7 @@ export default function CategoryOverlay({
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/60 bg-card/95 backdrop-blur px-6 py-4">
           <div>
-            <h2 className="font-serif text-xl font-medium text-heading capitalize">
+            <h2 className="font-serif text-xl font-medium text-heading">
               {displayName}
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -56,10 +57,10 @@ export default function CategoryOverlay({
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-secondary hover:text-foreground focus-ring active:scale-[0.97]"
             aria-label="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" strokeWidth={1.5} />
           </button>
         </div>
 
@@ -77,7 +78,7 @@ export default function CategoryOverlay({
                   <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                     {entry.title}
                   </span>
-                  <ArrowUpRight className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                  <ArrowUpRight className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100" strokeWidth={1.5} />
                 </div>
                 {entry.summary && (
                   <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">

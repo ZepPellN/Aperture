@@ -1,6 +1,7 @@
 import WikiLayout from '@/components/WikiLayout';
 import ArticleView from '@/components/ArticleView';
 import { loadArticle, loadAllArticles, getBacklinks, getWikiFiles, filePathToSlug, getWikiDir } from '@/lib/wiki-loader';
+import { getNeighborsFor } from '@/lib/semantic-neighbors';
 import { notFound } from 'next/navigation';
 
 interface WikiPageProps {
@@ -44,9 +45,25 @@ export default async function WikiPage({ params }: WikiPageProps) {
     label: b.label,
   }));
 
+  // Enrich semantic neighbors with article metadata
+  const slugToArticle = new Map(allArticles.map((a) => [a.slug, a]));
+  const rawNeighbors = getNeighborsFor(slugStr);
+  const semanticTrail = rawNeighbors
+    .map((n) => {
+      const neighbor = slugToArticle.get(n.slug);
+      if (!neighbor) return null;
+      return {
+        slug: n.slug,
+        title: neighbor.title,
+        category: neighbor.category,
+        score: n.score,
+      };
+    })
+    .filter((n): n is NonNullable<typeof n> => n !== null);
+
   return (
     <WikiLayout>
-      <ArticleView article={article} backlinks={backlinks} />
+      <ArticleView article={article} backlinks={backlinks} semanticTrail={semanticTrail} />
     </WikiLayout>
   );
 }

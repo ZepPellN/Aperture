@@ -7,22 +7,47 @@ import forceAtlas2 from 'graphology-layout-forceatlas2';
 import type { GraphData } from '@/lib/graph-builder';
 import Link from 'next/link';
 import { ArrowLeft, Info } from 'lucide-react';
+import { formatCategory } from '@/lib/utils';
 
 interface GraphViewProps {
   data: GraphData;
 }
 
-// Warm palette
-const WARM_BG = '#faf8f5';
-const WARM_EDGE = '#e8e0d6';
-const WARM_LABEL = '#6b5e50';
-const WARM_NODE_DEFAULT = '#c4b8a8';
+// Theme-aware palettes
+const PALETTE = {
+  light: {
+    bg: '#faf8f5',
+    edge: '#e8e0d6',
+    label: '#6b5e50',
+    node: '#c4b8a8',
+  },
+  dark: {
+    bg: '#161412',
+    edge: '#3d352e',
+    label: '#a89b8c',
+    node: '#5c534a',
+  },
+};
+
+function useTheme() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
 
 export default function GraphView({ data }: GraphViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
+  const isDark = useTheme();
 
   const selectedNode = data.nodes.find((n) => n.id === selected);
   const hoveredNode = data.nodes.find((n) => n.id === hovered);
@@ -55,13 +80,14 @@ export default function GraphView({ data }: GraphViewProps) {
     const settings = forceAtlas2.inferSettings(graph);
     forceAtlas2.assign(graph, { settings, iterations: 120 });
 
+    const theme = PALETTE[isDark ? 'dark' : 'light'];
     const sigma = new Sigma(graph, containerRef.current, {
       renderLabels: true,
       labelSize: 12,
       labelWeight: '500',
-      labelColor: { color: WARM_LABEL },
-      defaultNodeColor: WARM_NODE_DEFAULT,
-      defaultEdgeColor: WARM_EDGE,
+      labelColor: { color: theme.label },
+      defaultNodeColor: theme.node,
+      defaultEdgeColor: theme.edge,
       minCameraRatio: 0.05,
       maxCameraRatio: 2,
     });
@@ -84,11 +110,13 @@ export default function GraphView({ data }: GraphViewProps) {
       sigma.kill();
       sigmaRef.current = null;
     };
-  }, [data]);
+  }, [data, isDark]);
+
+  const theme = PALETTE[isDark ? 'dark' : 'light'];
 
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="relative overflow-hidden rounded-2xl border border-border" style={{ background: WARM_BG }}>
+      <div className="relative overflow-hidden rounded-2xl border border-border" style={{ background: theme.bg }}>
         <div ref={containerRef} className="h-[65vh] w-full" />
 
         {activeNode && (
@@ -97,7 +125,7 @@ export default function GraphView({ data }: GraphViewProps) {
               className="mb-1 inline-block rounded px-2 py-0.5 text-xs font-medium text-white"
               style={{ backgroundColor: activeNode.color }}
             >
-              {activeNode.category.replace(/-/g, ' ')}
+              {formatCategory(activeNode.category)}
             </div>
             <div className="text-lg font-medium text-foreground">{activeNode.label}</div>
             <Link
@@ -112,11 +140,11 @@ export default function GraphView({ data }: GraphViewProps) {
 
       <div className="mt-4 flex flex-wrap gap-3 text-sm">
         {Array.from(new Set(data.nodes.map((n) => n.category))).map((cat) => {
-          const color = data.nodes.find((n) => n.category === cat)?.color || WARM_NODE_DEFAULT;
+          const color = data.nodes.find((n) => n.category === cat)?.color || PALETTE[isDark ? 'dark' : 'light'].node;
           return (
             <div key={cat} className="flex items-center gap-1.5">
               <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-              <span className="text-muted-foreground capitalize">{cat.replace(/-/g, ' ')}</span>
+              <span className="text-muted-foreground">{formatCategory(cat)}</span>
             </div>
           );
         })}

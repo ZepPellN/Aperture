@@ -1,35 +1,99 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { contours } from 'd3-contour';
 import { geoPath } from 'd3-geo';
 import { UndirectedGraph } from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import type { GraphData, GraphNode } from '@/lib/graph-builder';
+import { formatCategory } from '@/lib/utils';
+import Link from 'next/link';
 
 interface KnowledgeMapProps {
   data: GraphData;
+  layoutMode?: 'force' | 'semantic';
 }
 
 const GRID_W = 220;
 
-// Warm sepia contour bands — lighter, airier palette
-const BAND_FILLS = [
-  'rgba(242, 232, 215, 0.42)',
-  'rgba(230, 215, 192, 0.48)',
-  'rgba(212, 192, 165, 0.54)',
-  'rgba(192, 168, 140, 0.58)',
-  'rgba(172, 148, 120, 0.62)',
-  'rgba(152, 130, 105, 0.65)',
-];
-const STROKE_COLORS = [
-  'rgba(185, 165, 140, 0.48)',
-  'rgba(168, 148, 122, 0.50)',
-  'rgba(152, 132, 108, 0.55)',
-  'rgba(138, 118, 92, 0.58)',
-  'rgba(122, 102, 78, 0.62)',
-  'rgba(108, 90, 68, 0.68)',
-];
+const THEME = {
+  light: {
+    bg: '#fdfcfa',
+    bandFills: [
+      'rgba(220, 210, 195, 0.05)',
+      'rgba(210, 198, 182, 0.06)',
+      'rgba(200, 186, 170, 0.07)',
+      'rgba(190, 174, 158, 0.08)',
+      'rgba(180, 164, 148, 0.09)',
+      'rgba(170, 154, 138, 0.10)',
+    ],
+    strokeColors: [
+      'rgba(200, 188, 172, 0.10)',
+      'rgba(190, 178, 162, 0.12)',
+      'rgba(180, 168, 152, 0.14)',
+      'rgba(170, 158, 142, 0.16)',
+      'rgba(160, 148, 132, 0.18)',
+      'rgba(150, 138, 122, 0.20)',
+    ],
+    faintEdge: 'rgba(160, 140, 115, 0.05)',
+    activeEdge: 'rgba(160, 140, 115, 0.35)',
+    dimEdge: 'rgba(160, 140, 115, 0.02)',
+    nodeRing: '#fdfcfa',
+    pillBg: 'rgba(250, 248, 245, 0.9)',
+    pillBorder: 'rgba(160, 140, 115, 0.3)',
+    pillText: '#3d3225',
+  },
+  dark: {
+    bg: '#161412',
+    bandFills: [
+      'rgba(60, 52, 42, 0.05)',
+      'rgba(70, 60, 50, 0.06)',
+      'rgba(80, 70, 58, 0.07)',
+      'rgba(90, 80, 66, 0.08)',
+      'rgba(100, 88, 74, 0.09)',
+      'rgba(110, 96, 82, 0.10)',
+    ],
+    strokeColors: [
+      'rgba(80, 70, 58, 0.10)',
+      'rgba(90, 80, 68, 0.12)',
+      'rgba(100, 90, 76, 0.14)',
+      'rgba(110, 98, 84, 0.16)',
+      'rgba(120, 106, 92, 0.18)',
+      'rgba(130, 114, 100, 0.20)',
+    ],
+    faintEdge: 'rgba(180, 160, 135, 0.06)',
+    activeEdge: 'rgba(180, 160, 135, 0.35)',
+    dimEdge: 'rgba(180, 160, 135, 0.02)',
+    nodeRing: '#161412',
+    pillBg: 'rgba(22, 20, 18, 0.9)',
+    pillBorder: 'rgba(140, 130, 115, 0.3)',
+    pillText: '#c4b8a8',
+  },
+};
+
+function useTheme() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : null;
+}
 
 function runLayout(data: GraphData): GraphNode[] {
   if (data.nodes.length === 0) return [];
@@ -119,12 +183,40 @@ function quantileThresholds(values: number[], count: number): number[] {
   return thresholds;
 }
 
-export default function KnowledgeMap({ data }: KnowledgeMapProps) {
+export default function KnowledgeMap({ data, layoutMode = 'force' }: KnowledgeMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hovered, setHovered] = useState<GraphNode | null>(null);
+  const [selected, setSelected] = useState<GraphNode | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const nodesRef = useRef<GraphNode[]>([]);
+  const isDark = useTheme();
+
+  const adjacency = useMemo(() => {
+    const map: Record<string, Set<string>> = {};
+    for (const node of data.nodes) map[node.id] = new Set();
+    for (const edge of data.edges) {
+      map[edge.source]?.add(edge.target);
+      map[edge.target]?.add(edge.source);
+    }
+    return map;
+  }, [data]);
+
+  const nodeStats = useMemo(() => {
+    const stats: Record<string, { outgoing: number; incoming: number }> = {};
+    for (const node of data.nodes) {
+      stats[node.id] = { outgoing: 0, incoming: 0 };
+    }
+    for (const edge of data.edges) {
+      stats[edge.source].outgoing++;
+      stats[edge.target].incoming++;
+    }
+    return stats;
+  }, [data]);
+
+  const activeNode = hovered || selected;
+  const activeId = activeNode?.id;
+  const neighborIds = activeId ? adjacency[activeId] : new Set<string>();
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -144,12 +236,26 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
-    // Warm cream background
-    ctx.fillStyle = '#fdfcfa';
+    const theme = THEME[isDark ? 'dark' : 'light'];
+
+    // Background
+    ctx.fillStyle = theme.bg;
     ctx.fillRect(0, 0, width, height);
 
-    // Run forceAtlas2 layout
-    const layoutNodes = runLayout(data);
+    // Choose layout: semantic coordinates or forceAtlas2
+    let layoutNodes: GraphNode[];
+    if (
+      layoutMode === 'semantic' &&
+      data.nodes.some((n) => n.semanticX !== null && n.semanticY !== null)
+    ) {
+      layoutNodes = data.nodes.map((n) => ({
+        ...n,
+        x: n.semanticX ?? Math.random() * 100,
+        y: n.semanticY ?? Math.random() * 100,
+      }));
+    } else {
+      layoutNodes = runLayout(data);
+    }
     const gridH = Math.round((height / width) * GRID_W);
 
     // Build density field
@@ -157,52 +263,47 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
     const nonzero = values.filter((v) => v > 0);
     const maxVal = Math.max(...values);
 
-    if (nonzero.length === 0 || maxVal === 0) return;
+    if (nonzero.length > 0 && maxVal > 0) {
+      const thresholds = quantileThresholds(values, theme.bandFills.length);
+      if (thresholds.length > 0) {
+        const contourGen = contours()
+          .size([GRID_W, gridH])
+          .thresholds(thresholds);
+        const contourData = contourGen(values);
+        const scaleX = width / GRID_W;
+        const scaleY = height / gridH;
+        const pathGen = geoPath();
 
-    // Quantile-based thresholds
-    const thresholds = quantileThresholds(values, BAND_FILLS.length);
-    if (thresholds.length === 0) return;
+        // Very subtle contour fills
+        contourData.forEach((feature, i) => {
+          const d = pathGen(feature);
+          if (!d) return;
+          const p2d = new Path2D(d);
+          ctx.save();
+          ctx.scale(scaleX, scaleY);
+          ctx.fillStyle = theme.bandFills[i] || theme.bandFills[theme.bandFills.length - 1];
+          ctx.fill(p2d);
+          ctx.restore();
+        });
 
-    // Use plain number[] for d3-contour
-    const contourGen = contours()
-      .size([GRID_W, gridH])
-      .thresholds(thresholds);
-    const contourData = contourGen(values);
-
-    const scaleX = width / GRID_W;
-    const scaleY = height / gridH;
-
-    // Use SVG-string geoPath then Path2D for reliable canvas rendering
-    const pathGen = geoPath();
-
-    // Draw filled contour bands
-    contourData.forEach((feature, i) => {
-      const d = pathGen(feature);
-      if (!d) return;
-      const p2d = new Path2D(d);
-      ctx.save();
-      ctx.scale(scaleX, scaleY);
-      ctx.fillStyle = BAND_FILLS[i] || BAND_FILLS[BAND_FILLS.length - 1];
-      ctx.fill(p2d);
-      ctx.restore();
-    });
-
-    // Draw contour strokes
-    contourData.forEach((feature, i) => {
-      const d = pathGen(feature);
-      if (!d) return;
-      const p2d = new Path2D(d);
-      ctx.save();
-      ctx.scale(scaleX, scaleY);
-      ctx.strokeStyle = STROKE_COLORS[i] || STROKE_COLORS[STROKE_COLORS.length - 1];
-      ctx.lineWidth = 0.8;
-      if (i % 2 === 1) {
-        ctx.setLineDash([2, 2]);
+        // Very subtle contour strokes
+        contourData.forEach((feature, i) => {
+          const d = pathGen(feature);
+          if (!d) return;
+          const p2d = new Path2D(d);
+          ctx.save();
+          ctx.scale(scaleX, scaleY);
+          ctx.strokeStyle = theme.strokeColors[i] || theme.strokeColors[theme.strokeColors.length - 1];
+          ctx.lineWidth = 0.6;
+          if (i % 2 === 1) {
+            ctx.setLineDash([2, 2]);
+          }
+          ctx.stroke(p2d);
+          ctx.setLineDash([]);
+          ctx.restore();
+        });
       }
-      ctx.stroke(p2d);
-      ctx.setLineDash([]);
-      ctx.restore();
-    });
+    }
 
     // Normalize node positions
     const xs = layoutNodes.map((n) => n.x);
@@ -222,44 +323,87 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
     }));
     nodesRef.current = normalizedNodes;
 
-    // Draw faint edges
-    ctx.strokeStyle = 'rgba(160, 140, 115, 0.06)';
-    ctx.lineWidth = 0.5;
+    const nodeMap = new Map(normalizedNodes.map((n) => [n.id, n]));
+
+    // Draw category-colored glows behind nodes
+    for (const node of normalizedNodes) {
+      const rgb = hexToRgb(node.color);
+      if (!rgb) continue;
+      const glowR = Math.max(30, node.size * 8);
+      const grad = ctx.createRadialGradient(node.cx, node.cy, 0, node.cx, node.cy, glowR);
+      const alpha = isDark ? 0.10 : 0.08;
+      grad.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`);
+      grad.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(node.cx, node.cy, glowR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw edges
     for (const edge of data.edges) {
-      const s = normalizedNodes.find((n) => n.id === edge.source);
-      const t = normalizedNodes.find((n) => n.id === edge.target);
-      if (s && t) {
-        ctx.beginPath();
-        ctx.moveTo(s.cx, s.cy);
-        ctx.lineTo(t.cx, t.cy);
-        ctx.stroke();
+      const s = nodeMap.get(edge.source);
+      const t = nodeMap.get(edge.target);
+      if (!s || !t) continue;
+
+      const isActiveEdge = activeId && (edge.source === activeId || edge.target === activeId);
+      const isDimmedEdge = activeId && !isActiveEdge;
+
+      ctx.beginPath();
+      ctx.moveTo(s.cx, s.cy);
+      ctx.lineTo(t.cx, t.cy);
+
+      if (isActiveEdge) {
+        ctx.strokeStyle = theme.activeEdge;
+        ctx.lineWidth = 1.2;
+        ctx.globalAlpha = 1;
+      } else if (isDimmedEdge) {
+        ctx.strokeStyle = theme.dimEdge;
+        ctx.lineWidth = 0.5;
+        ctx.globalAlpha = 0.3;
+      } else {
+        ctx.strokeStyle = theme.faintEdge;
+        ctx.lineWidth = 0.5;
+        ctx.globalAlpha = 1;
       }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
     }
 
     // Draw nodes
     for (const node of normalizedNodes) {
       const r = Math.max(2.5, node.size * 0.35);
+      const isActive = node.id === activeId;
+      const isNeighbor = activeId ? neighborIds.has(node.id) : false;
+      const isDimmed = activeId && !isActive && !isNeighbor;
 
-      // White ring
+      ctx.globalAlpha = isDimmed ? 0.25 : 1;
+
+      // Outer glow ring for active node
+      if (isActive) {
+        ctx.beginPath();
+        ctx.arc(node.cx, node.cy, r + 6, 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+        ctx.fill();
+      }
+
+      // Background ring
       ctx.beginPath();
       ctx.arc(node.cx, node.cy, r + 2, 0, Math.PI * 2);
-      ctx.fillStyle = '#fdfcfa';
+      ctx.fillStyle = theme.nodeRing;
       ctx.fill();
 
       // Node dot
       ctx.beginPath();
       ctx.arc(node.cx, node.cy, r, 0, Math.PI * 2);
       ctx.fillStyle = node.color;
-      ctx.globalAlpha = 0.8;
+      ctx.globalAlpha = isDimmed ? 0.3 : 0.9;
       ctx.fill();
       ctx.globalAlpha = 1;
     }
 
     // Category labels at centroids
-    const catCenters: Record<
-      string,
-      { x: number; y: number; count: number }
-    > = {};
+    const catCenters: Record<string, { x: number; y: number; count: number }> = {};
     for (const node of normalizedNodes) {
       if (!catCenters[node.category]) {
         catCenters[node.category] = { x: 0, y: 0, count: 0 };
@@ -277,7 +421,7 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
     for (const [cat, center] of Object.entries(catCenters)) {
       const cx = center.x / center.count;
       const cy = center.y / center.count;
-      const text = cat.replace(/-/g, ' ');
+      const text = formatCategory(cat);
 
       const metrics = ctx.measureText(text);
       const tw = metrics.width;
@@ -285,8 +429,7 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
       const px = 8;
       const py = 4;
 
-      // Pill background
-      ctx.fillStyle = 'rgba(250, 248, 245, 0.9)';
+      ctx.fillStyle = theme.pillBg;
       ctx.beginPath();
       ctx.roundRect(
         cx - tw / 2 - px,
@@ -297,16 +440,14 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
       );
       ctx.fill();
 
-      // Border
-      ctx.strokeStyle = 'rgba(160, 140, 115, 0.3)';
+      ctx.strokeStyle = theme.pillBorder;
       ctx.lineWidth = 0.8;
       ctx.stroke();
 
-      // Text
-      ctx.fillStyle = '#3d3225';
+      ctx.fillStyle = theme.pillText;
       ctx.fillText(text, cx, cy + 0.5);
     }
-  }, [data]);
+  }, [data, isDark, activeId, neighborIds, layoutMode]);
 
   useEffect(() => {
     draw();
@@ -330,7 +471,7 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
         const dx = (node as any).cx - x;
         const dy = (node as any).cy - y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 18 && dist < minDist) {
+        if (dist < 20 && dist < minDist) {
           minDist = dist;
           closest = node;
         }
@@ -344,16 +485,22 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
 
   const handleClick = useCallback(() => {
     if (hovered) {
+      setSelected(hovered);
       window.location.href = `/wiki/${hovered.id}`;
     }
   }, [hovered]);
+
+  const statsFor = (node: GraphNode | null) => {
+    if (!node) return null;
+    return nodeStats[node.id] || { outgoing: 0, incoming: 0 };
+  };
 
   return (
     <div className="mx-auto max-w-7xl">
       <div
         ref={containerRef}
         className="relative overflow-hidden rounded-2xl border border-border"
-        style={{ height: '65vh', background: '#fdfcfa' }}
+        style={{ height: '65vh', background: isDark ? '#161412' : '#fdfcfa' }}
       >
         <canvas
           ref={canvasRef}
@@ -363,28 +510,68 @@ export default function KnowledgeMap({ data }: KnowledgeMapProps) {
           onClick={handleClick}
         />
 
+        {/* Hover tooltip */}
         {hovered && (
           <div
             className="pointer-events-none absolute z-10 rounded-lg border border-border bg-card px-3 py-2 shadow-lg"
             style={{ left: tooltipPos.x, top: tooltipPos.y }}
           >
-            <div className="text-xs font-medium text-primary capitalize">
-              {hovered.category.replace(/-/g, ' ')}
+            <div className="text-xs font-medium text-primary">
+              {formatCategory(hovered.category)}
             </div>
             <div className="text-sm font-medium text-foreground">
               {hovered.label}
             </div>
+            {(() => {
+              const s = statsFor(hovered);
+              return s ? (
+                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                  <span>{s.outgoing} out</span>
+                  <span>{s.incoming} in</span>
+                </div>
+              ) : null;
+            })()}
+          </div>
+        )}
+
+        {/* Selected node info panel */}
+        {selected && !hovered && (
+          <div className="absolute bottom-4 left-4 max-w-sm rounded-xl border border-border bg-card/95 p-4 shadow-sm backdrop-blur">
+            <div
+              className="mb-1 inline-block rounded px-2 py-0.5 text-xs font-medium text-white"
+              style={{ backgroundColor: selected.color }}
+            >
+              {formatCategory(selected.category)}
+            </div>
+            <div className="text-lg font-medium text-foreground">
+              {selected.label}
+            </div>
+            {(() => {
+              const s = statsFor(selected);
+              return s ? (
+                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                  <span>{s.outgoing} links out</span>
+                  <span>{s.incoming} links in</span>
+                </div>
+              ) : null;
+            })()}
+            <Link
+              href={`/wiki/${selected.id}`}
+              className="mt-2 inline-flex items-center text-sm font-medium text-primary transition-colors duration-200 hover:text-accent"
+            >
+              Open article →
+            </Link>
           </div>
         )}
       </div>
 
       {/* Legend */}
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-        <span className="text-xs font-medium uppercase tracking-wider">
+        <span className="text-xs font-medium tracking-tight">
           Knowledge Density
         </span>
         <div className="flex items-center gap-0.5">
-          {BAND_FILLS.map((c, i) => (
+          {(isDark ? THEME.dark.bandFills : THEME.light.bandFills).map((c, i) => (
             <span
               key={i}
               className="inline-block h-3 w-8 first:rounded-l last:rounded-r"

@@ -6,6 +6,7 @@ import { GitBranch, ArrowRight, ChevronRight, Clock } from 'lucide-react';
 import Greeting from '@/components/Greeting';
 import SearchBar from '@/components/SearchBar';
 import CategoryOverlay from '@/components/CategoryOverlay';
+import { formatCategory } from '@/lib/utils';
 
 interface Entry {
   slug: string;
@@ -77,18 +78,18 @@ export default function HomeContent({
       {/* Left sidebar */}
       <aside className="hidden lg:block w-44 shrink-0">
         <div className="sticky top-20 space-y-1">
-          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="mb-3 text-[13px] font-medium tracking-tight text-muted-foreground">
             Categories
           </div>
           {categoryList.map((cat) => (
             <button
               key={cat}
               onClick={() => scrollToCategory(cat)}
-              className="group flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="group flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors duration-200 hover:bg-secondary hover:text-foreground focus-ring"
             >
               <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" />
-              <span className="truncate capitalize">
-                {cat.replace(/-/g, ' ')}
+              <span className="truncate">
+                {formatCategory(cat)}
               </span>
               <span className="ml-auto text-xs text-muted-foreground/60">
                 {byCategory[cat].length}
@@ -113,9 +114,9 @@ export default function HomeContent({
               <button
                 key={cat}
                 onClick={() => scrollToCategory(cat)}
-                className="shrink-0 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="shrink-0 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors duration-200 hover:bg-secondary hover:text-foreground focus-ring"
               >
-                {cat.replace(/-/g, ' ')} ({byCategory[cat].length})
+                {formatCategory(cat)} ({byCategory[cat].length})
               </button>
             ))}
           </div>
@@ -125,8 +126,8 @@ export default function HomeContent({
         {recentEntries.length > 0 && (
           <section className="space-y-4">
             <div className="flex items-baseline justify-between">
-              <h2 className="font-serif text-2xl font-normal tracking-tight text-heading">
-                Recently Updated
+              <h2 className="font-serif text-2xl font-normal tracking-tight text-heading text-balance">
+                Recently updated
               </h2>
               <span className="text-sm text-muted-foreground">
                 Last {recentEntries.length} changes
@@ -138,7 +139,7 @@ export default function HomeContent({
                 (bucket) =>
                   groupedByTime[bucket] && (
                     <div key={bucket}>
-                      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <h3 className="mb-2 text-xs font-semibold tracking-tight text-muted-foreground">
                         {bucket}
                       </h3>
                       <div className="divide-y divide-border/40 rounded-xl border border-border bg-card">
@@ -146,7 +147,7 @@ export default function HomeContent({
                           <Link
                             key={entry.slug}
                             href={`/wiki/${entry.slug}`}
-                            className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-secondary first:rounded-t-xl last:rounded-b-xl"
+                            className="group flex items-center gap-3 px-4 py-3 transition-colors duration-200 hover:bg-secondary first:rounded-t-xl last:rounded-b-xl focus-ring rounded-sm"
                           >
                             <Clock className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
                             <div className="min-w-0 flex-1">
@@ -160,7 +161,7 @@ export default function HomeContent({
                               )}
                             </div>
                             <span className="hidden sm:block text-xs text-muted-foreground/60 shrink-0">
-                              {entry.category.replace(/-/g, ' ')}
+                              {formatCategory(entry.category)}
                             </span>
                           </Link>
                         ))}
@@ -175,15 +176,15 @@ export default function HomeContent({
         {/* Category Cards */}
         <section className="space-y-4">
           <div className="flex items-baseline justify-between">
-            <h2 className="font-serif text-2xl font-normal tracking-tight text-heading">
-              Browse by Category
+            <h2 className="font-serif text-2xl font-normal tracking-tight text-heading text-balance">
+              Browse by category
             </h2>
             <span className="text-sm text-muted-foreground">
               {stats.categoryCount} categories · {stats.total} articles
             </span>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             {Object.entries(byCategory).map(([category, entries]) => (
               <div
                 key={category}
@@ -191,8 +192,8 @@ export default function HomeContent({
                 className="group flex flex-col rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-sm"
               >
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-heading">
-                    {category.replace(/-/g, ' ')}
+                  <h3 className="text-sm font-semibold tracking-tight text-heading">
+                    {formatCategory(category)}
                   </h3>
                   <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
                     {entries.length}
@@ -215,10 +216,10 @@ export default function HomeContent({
                 <div className="mt-3 pt-3 border-t border-border/60">
                   <button
                     onClick={() => setActiveOverlay(category)}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-accent"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors duration-200 hover:text-accent focus-ring rounded active:scale-[0.97]"
                   >
                     View all {entries.length} articles
-                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </button>
                 </div>
               </div>
@@ -245,7 +246,7 @@ export default function HomeContent({
 
           <Link
             href="/graph"
-            className="inline-flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-all hover:bg-primary hover:text-primary-foreground active:scale-95"
+            className="inline-flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-all duration-200 hover:bg-primary hover:text-primary-foreground active:scale-[0.97] focus-ring"
           >
             <GitBranch className="h-4 w-4" />
             Explore Graph

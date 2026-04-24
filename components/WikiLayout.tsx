@@ -28,13 +28,13 @@ export default function WikiLayout({ children }: WikiLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-dvh bg-background text-foreground transition-colors duration-300">
       {/* Top nav */}
       <header className="sticky top-0 z-50 border-b border-border/60 bg-card/80 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <Link
             href="/"
-            className="flex items-center gap-2 font-serif text-lg font-medium tracking-tight"
+            className="flex items-center gap-2 font-serif text-lg font-medium tracking-tight rounded-md focus-ring"
           >
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-sans">
               A
@@ -51,7 +51,7 @@ export default function WikiLayout({ children }: WikiLayoutProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all active:scale-95 ${
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.97] focus-ring ${
                       active
                         ? 'bg-secondary text-foreground'
                         : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
@@ -66,10 +66,12 @@ export default function WikiLayout({ children }: WikiLayoutProps) {
 
             <button
               onClick={() => setIsDark(!isDark)}
-              className="ml-1 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              aria-label="Toggle dark mode"
+              className="ml-1 flex h-8 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground transition-colors duration-200 hover:bg-secondary hover:text-foreground focus-ring"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+              <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
             </button>
           </div>
         </div>
@@ -79,18 +81,28 @@ export default function WikiLayout({ children }: WikiLayoutProps) {
       <main className="mx-auto max-w-7xl px-4 py-8 lg:px-8">{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-border/60 py-8 text-center text-sm text-muted-foreground">
-        <p>
-          Powered by{' '}
-          <a
-            href="https://github.com/ZepPellN/aperture"
-            className="underline underline-offset-2 hover:text-foreground"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Aperture
-          </a>
-        </p>
+      <footer className="border-t border-border/60 py-10 text-center text-sm text-muted-foreground">
+        <div className="mx-auto max-w-7xl px-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Powered by{' '}
+            <a
+              href="https://github.com/ZepPellN/aperture"
+              className="underline underline-offset-2 hover:text-foreground transition-colors duration-200 rounded focus-ring"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Aperture
+            </a>
+          </p>
+          <nav className="flex items-center justify-center gap-4">
+            <Link href="/" className="hover:text-foreground transition-colors duration-200 rounded focus-ring">
+              Home
+            </Link>
+            <Link href="/graph" className="hover:text-foreground transition-colors duration-200 rounded focus-ring">
+              Graph
+            </Link>
+          </nav>
+        </div>
       </footer>
     </div>
   );

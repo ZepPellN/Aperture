@@ -178,13 +178,18 @@ export async function loadWikiIndex(): Promise<WikiIndexEntry[]> {
 }
 
 export function getBacklinks(articles: WikiArticle[], targetSlug: string): WikiLink[] {
+  const seen = new Set<string>();
   const backlinks: WikiLink[] = [];
 
   for (const article of articles) {
     const { links } = transformWikilinks(article.content);
     for (const link of links) {
       if (link.to === targetSlug.toLowerCase().replace(/\s+/g, '-')) {
-        backlinks.push({ from: article.slug, to: targetSlug, label: article.title });
+        if (!seen.has(article.slug)) {
+          seen.add(article.slug);
+          backlinks.push({ from: article.slug, to: targetSlug, label: article.title });
+        }
+        break;
       }
     }
   }

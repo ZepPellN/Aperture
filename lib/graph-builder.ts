@@ -1,5 +1,7 @@
 import type { WikiArticle, WikiLink } from './wiki-loader';
 import { transformWikilinks } from './wiki-loader';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 export interface GraphNode {
   id: string;
@@ -7,6 +9,8 @@ export interface GraphNode {
   category: string;
   x: number;
   y: number;
+  semanticX: number | null;
+  semanticY: number | null;
   size: number;
   color: string;
 }
@@ -25,17 +29,32 @@ export interface GraphData {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'harness-engineering': '#3b82f6',
-  'claude-code': '#8b5cf6',
-  'ai-ecosystem': '#10b981',
-  'ai-tools': '#f59e0b',
-  'product-trends': '#ef4444',
-  'forecasts': '#06b6d4',
-  'mental-models': '#ec4899',
-  'writing': '#6366f1',
-  'self': '#84cc16',
-  uncategorized: '#9ca3af',
+  'harness-engineering': '#8c7b6b',
+  'claude-code': '#b08968',
+  'ai-ecosystem': '#7a8b7a',
+  'ai-tools': '#c4a882',
+  'product-trends': '#a67c6b',
+  'forecasts': '#7a9ca5',
+  'mental-models': '#9b8aa5',
+  'writing': '#8b9dc3',
+  'self': '#9aaa8c',
+  uncategorized: '#a8a29e',
 };
+
+interface SemanticLayout {
+  [slug: string]: { x: number; y: number };
+}
+
+function loadSemanticLayout(): SemanticLayout {
+  const path = join(process.cwd(), 'lib', 'semantic-layout.json');
+  if (!existsSync(path)) return {};
+  try {
+    const raw = readFileSync(path, 'utf-8');
+    return JSON.parse(raw) as SemanticLayout;
+  } catch {
+    return {};
+  }
+}
 
 function getCategoryColor(category: string): string {
   return CATEGORY_COLORS[category] || CATEGORY_COLORS.uncategorized;
@@ -48,6 +67,7 @@ export function buildGraph(articles: WikiArticle[]): GraphData {
   const edgeSet = new Set<string>();
   const linkCounts: Record<string, number> = {};
   const incomingCounts: Record<string, number> = {};
+  const semanticLayout = loadSemanticLayout();
 
   // First pass: count links
   for (const article of articles) {
@@ -62,12 +82,15 @@ export function buildGraph(articles: WikiArticle[]): GraphData {
   for (const article of articles) {
     nodeSet.add(article.slug);
     const degree = (linkCounts[article.slug] || 0) + (incomingCounts[article.slug] || 0);
+    const semantic = semanticLayout[article.slug];
     nodes.push({
       id: article.slug,
       label: article.title,
       category: article.category,
       x: Math.random() * 100,
       y: Math.random() * 100,
+      semanticX: semantic?.x ?? null,
+      semanticY: semantic?.y ?? null,
       size: Math.max(3, Math.min(12, 3 + degree)),
       color: getCategoryColor(article.category),
     });
