@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:semantic && next build",
     "build:semantic": "tsx scripts/build-semantic.ts",
     "start": "next start",
     "lint": "eslint -c .config/eslint.config.mjs"

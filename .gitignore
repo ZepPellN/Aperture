@@ -43,3 +43,21 @@ next-env.d.ts
 
 # temp files
 /temp/
+
+# Generated semantic data (regenerated via `npm run build:semantic`)
+/lib/semantic-layout.json
+/lib/semantic-neighbors.json
+
+# Private design-taste skills (not part of core project)
+/.agents/
+/.claude/skills/design-taste-frontend
+/.claude/skills/full-output-enforcement
+/.claude/skills/gpt-taste
+/.claude/skills/high-end-visual-design
+/.claude/skills/image-taste-frontend
+/.claude/skills/industrial-brutalist-ui
+/.claude/skills/minimalist-ui
+/.claude/skills/redesign-existing-projects
+/.claude/skills/stitch-design-taste
+/skills/
+/skills-lock.json

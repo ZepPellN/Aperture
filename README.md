@@ -228,6 +228,27 @@ Remove the graph route or remove the link from the navigation in `components/Wik
 
 ---
 
+## Semantic Features
+
+Aperture supports semantic discovery via vector embeddings. These features require [qmd](https://github.com/ZepPellN/qmd) (Quick Markdown Search) to be installed and your wiki indexed.
+
+```bash
+# Install qmd
+brew install qmd
+
+# Index your vault
+qmd collection add vault /path/to/your/vault
+qmd update
+qmd embed
+```
+
+The build process automatically generates semantic layouts and neighbor maps from qmd's index:
+
+- **Cognitive Map** — UMAP projection of your wiki's semantic landscape (Graph page)
+- **Semantic Trail** — Related-article discovery paths on each article page
+
+If qmd is not installed or the index is missing, the build falls back gracefully to link-based layouts only.
+
 ## Deploying
 
 ### Static Export (Recommended)
@@ -243,6 +264,7 @@ This outputs a static site to `dist/`. Deploy to Vercel, Netlify, GitHub Pages, 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `WIKI_ROOT` | Yes | Absolute path to your vault (the directory containing `wiki/`) |
+| `QMD_INDEX` | No | Path to qmd's sqlite index (default: `~/.cache/qmd/index.sqlite`) |
 
 ---
 

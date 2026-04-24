@@ -26,6 +26,11 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      - name: Install qmd
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install qmd
+
       - name: Install dependencies
         run: npm ci
 

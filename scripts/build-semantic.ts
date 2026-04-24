@@ -1,9 +1,10 @@
 import { DatabaseSync } from 'node:sqlite';
 import { writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { homedir } from 'os';
 import { UMAP } from 'umap-js';
 
-const QMD_DB = '/Users/jean/.cache/qmd/index.sqlite';
+const QMD_DB = process.env.QMD_INDEX || join(homedir(), '.cache', 'qmd', 'index.sqlite');
 const LAYOUT_OUTPUT = join(process.cwd(), 'lib', 'semantic-layout.json');
 const NEIGHBORS_OUTPUT = join(process.cwd(), 'lib', 'semantic-neighbors.json');
 
