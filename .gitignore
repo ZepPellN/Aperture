@@ -61,3 +61,5 @@ next-env.d.ts
 /.claude/skills/stitch-design-taste
 /skills/
 /skills-lock.json
+
+.claude/scheduled_tasks.lock

@@ -5,7 +5,7 @@ Ingest Protocol, Classification Rules, or vault paths.
 
 ## Vault & Paths
 
-- **Vault path**: `{{VAULT_PATH}}` (set this to your wiki root directory, e.g., `/path/to/your/vault`)
+- **Vault path**: `/Users/jean/Documents/Obsidian Vault`
 - **Raw root**: `$VAULT/raw`
 - **Wiki root**: `$VAULT/wiki`
 - **Schema file**: `$VAULT/CLAUDE.md`
@@ -60,6 +60,39 @@ State is tracked in `wiki/_absorb_log.json`.
 Status values: `absorbed` | `skipped_empty` | `skipped_duplicate` | `failed` | `pending`
 
 Also append a human-readable entry to `wiki/log.md`.
+
+## Candidate System
+
+Inspired by Foundry's compile workflow. A concept page needs **at least 2 sources** to be considered "mature." Single-source pages are **Candidates** — they exist but are not yet full concept pages.
+
+### Page Maturity States
+
+| State | Condition | Location/Tag |
+|-------|-----------|-------------|
+| `candidate` | `sources: 1` | Frontmatter `status: candidate` |
+| `mature` | `sources: 2+` | Frontmatter `status: mature` (or omitted, default) |
+
+### Candidate Rules
+
+1. **On creation**: If a new wiki page is seeded by a single source, set `status: candidate` in frontmatter.
+2. **On absorb**: When a second (or more) source enriches a candidate page:
+   - Remove `status: candidate` (or set `status: mature`)
+   - Rewrite the page as a synthesized concept page, not a summary of either source
+   - Use the Concept Page Template (see below)
+3. **Candidates directory**: Optionally place candidate pages in `wiki/candidates/` subdirectory. Move to relevant section on promotion.
+4. **Cleanup**: `wiki-cleanup` flags candidates that have been waiting >30 days without a second source — suggest deletion or merge into a parent page.
+
+### Candidate Frontmatter
+
+```yaml
+---
+title: Topic Name
+section: section-name
+sources: 1
+status: candidate
+updated: YYYY-MM-DD
+---
+```
 
 ## Ingest Protocol
 
@@ -139,6 +172,65 @@ updated: YYYY-MM-DD
 
 - [[raw/path/to/source.md|Source Display Name]]
 ```
+
+### Concept Page Template (for mature pages with 2+ sources)
+
+Use this template when promoting a candidate to mature, or when creating a new page that already has 2+ sources.
+
+```markdown
+---
+title: Concept Name
+section: section-name
+sources: 2
+updated: YYYY-MM-DD
+---
+
+# Concept Name
+
+## What it is
+
+{A clear, concise definition of the concept. One paragraph.}
+
+## Why it matters
+
+{Why this concept is important in the context of AI, software engineering, or Jean's work.}
+
+## Key points
+
+- {Point distilled from multiple sources}
+- {Another point with consensus or tension across sources}
+- {Pattern or framework that emerges}
+
+## Evidence across sources
+
+| Source | Key Claim | Relevance |
+|--------|-----------|-----------|
+| [[raw/path/to/source-a.md|Source A]] | {Claim} | {How it supports the concept} |
+| [[raw/path/to/source-b.md|Source B]] | {Claim} | {How it supports or contradicts} |
+
+## Open questions
+
+- {What remains unclear or contested?}
+- {What would change Jean's mind on this?}
+
+## Prompts for witness
+
+- {Essay-shaped question where this concept intersects with Jean's personal experience or goals}
+- {Reflection prompt: how does this concept apply to Jean's current projects?}
+- {Contrarian prompt: what would the opposite of this concept look like in practice?}
+
+## Related
+
+- [[related-concept]]
+- [[another-page]]
+
+## Sources
+
+- [[raw/path/to/source-a.md|Source A]]
+- [[raw/path/to/source-b.md|Source B]]
+```
+
+**Prompts for witness** are essay-shaped questions designed to bridge compiled knowledge and personal reflection. They should be specific enough to provoke writing but open enough to allow exploration. Update them as new sources arrive.
 
 ### Linking
 

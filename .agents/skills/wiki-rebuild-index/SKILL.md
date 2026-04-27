@@ -10,9 +10,9 @@ argument-hint: ""
 
 Regenerate `wiki/index.md` and `wiki/_backlinks.json` from the current wiki state.
 
-**Vault path**: `{{VAULT_PATH}}` (set this to your wiki root directory)
+**Vault path**: `/Users/jean/Documents/Obsidian Vault`
 
-**Tool**: Use your vault's CLI tool (e.g., Obsidian CLI at `/Applications/Obsidian.app/Contents/MacOS/obsidian`) or direct file reads/writes for vault operations.
+**Tool**: Use `/Applications/Obsidian.app/Contents/MacOS/obsidian` for vault reads/writes.
 
 ## Rebuild index.md
 

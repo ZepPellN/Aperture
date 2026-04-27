@@ -52,7 +52,22 @@ Good:
 "X is a ___" — named people, companies, products, tools, projects, frameworks,
 concepts that appear in text but lack their own page.
 
-## Phase 3: Integration
+## Phase 3: Candidate Audit
+
+Check all pages with `status: candidate` in frontmatter:
+
+1. **Stale candidates**: `updated` > 30 days ago and still `sources: 1`
+   - Suggest deletion or merge into parent page
+   - Flag in report: "Candidate abandoned — no second source after N days"
+
+2. **Candidates ready to compile**: `sources: 1` but a second relevant source exists in `raw/` (not yet absorbed)
+   - List: candidate page + matching raw file(s)
+   - Suggest: run `/wiki-absorb` on the raw file to promote
+
+3. **Candidate quality**: Even with `sources: 1`, is the page thin (<100 words)?
+   - Suggest merge or expansion
+
+## Phase 4: Integration
 
 1. Deduplicate candidates across all subagent reports.
 2. Create new articles for high-value candidates.

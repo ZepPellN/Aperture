@@ -36,6 +36,29 @@ Process files chronologically. For each file:
 5. Connect to patterns. When the same theme surfaces across sources, ensure the
    concept article captures it.
 
+## Candidate Handling
+
+Follow the Candidate System from `_wiki-common.md`:
+
+**When creating a new page from a single source:**
+- Set frontmatter `status: candidate`
+- Place in `wiki/candidates/` or relevant section
+- Use standard article format (not concept template)
+- Add to `wiki/index.md` with `(candidate)` note
+
+**When a second source enriches an existing candidate:**
+- This is a **promotion**. Remove `status: candidate` (or set `status: mature`)
+- **Rewrite the page** using the Concept Page Template from `_wiki-common.md`
+- The page must synthesize across sources, not just append the new source
+- Move from `wiki/candidates/` to the relevant section if applicable
+- Update `wiki/index.md` to remove `(candidate)` note
+
+**When updating an existing mature page:**
+- Integrate new source into existing structure
+- Increment `sources` count in frontmatter
+- Update `## Evidence across sources` table if present
+- Refresh `## Prompts for witness` if new intersections emerge
+
 ## Source Priority
 
 | Priority | Source | Treatment |
