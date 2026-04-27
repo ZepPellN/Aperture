@@ -16,6 +16,13 @@ interface Entry {
   updated?: string;
 }
 
+interface NeighborNode {
+  slug: string;
+  title: string;
+  category: string;
+  score: number;
+}
+
 interface HomeContentProps {
   index: Entry[];
   stats: {
@@ -25,6 +32,7 @@ interface HomeContentProps {
     categoryCount: number;
   };
   byCategory: Record<string, Entry[]>;
+  neighborsMap?: Record<string, NeighborNode[]>;
 }
 
 function timeBucket(dateStr: string): string {
@@ -42,6 +50,7 @@ export default function HomeContent({
   index,
   stats,
   byCategory,
+  neighborsMap,
 }: HomeContentProps) {
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
   const categoryList = Object.keys(byCategory);
@@ -104,7 +113,7 @@ export default function HomeContent({
         {/* Greeting + Search */}
         <section className="max-w-2xl">
           <Greeting />
-          <SearchBar entries={index} />
+          <SearchBar entries={index} neighborsMap={neighborsMap} />
         </section>
 
         {/* Mobile category pills */}

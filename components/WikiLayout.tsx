@@ -2,29 +2,41 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { GitBranch, Home, Moon, Sun } from 'lucide-react';
+import { GitBranch, Home, Moon, Sun, Orbit, Footprints, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface WikiLayoutProps {
   children: React.ReactNode;
 }
 
+function getInitialTheme(): boolean {
+  if (typeof window === 'undefined') return false;
+  const saved = localStorage.getItem('aperture-theme');
+  if (saved) return saved === 'dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 export default function WikiLayout({ children }: WikiLayoutProps) {
   const pathname = usePathname();
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(getInitialTheme);
 
   useEffect(() => {
     const root = document.documentElement;
     if (isDark) {
       root.classList.add('dark');
+      localStorage.setItem('aperture-theme', 'dark');
     } else {
       root.classList.remove('dark');
+      localStorage.setItem('aperture-theme', 'light');
     }
   }, [isDark]);
 
   const nav = [
     { href: '/', label: 'Home', icon: Home },
+    { href: '/life', label: 'Life', icon: Heart },
     { href: '/graph', label: 'Graph', icon: GitBranch },
+    { href: '/clusters', label: 'Clusters', icon: Orbit },
+    { href: '/walk', label: 'Walk', icon: Footprints },
   ];
 
   return (
@@ -97,6 +109,9 @@ export default function WikiLayout({ children }: WikiLayoutProps) {
           <nav className="flex items-center justify-center gap-4">
             <Link href="/" className="hover:text-foreground transition-colors duration-200 rounded focus-ring">
               Home
+            </Link>
+            <Link href="/life" className="hover:text-foreground transition-colors duration-200 rounded focus-ring">
+              Life
             </Link>
             <Link href="/graph" className="hover:text-foreground transition-colors duration-200 rounded focus-ring">
               Graph

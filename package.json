@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run build:semantic && next build",
+    "build": "npm run build:semantic && npm run tasks && npm run weekly-review && next build",
     "build:semantic": "tsx scripts/build-semantic.ts",
+    "insight": "tsx scripts/insight-report.ts",
+    "tasks": "tsx scripts/task-extract.ts",
+    "weekly-review": "tsx scripts/weekly-review.ts",
     "start": "next start",
     "lint": "eslint -c .config/eslint.config.mjs"
   },
@@ -35,13 +38,16 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.184.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "umap-js": "^1.4.0"
   }

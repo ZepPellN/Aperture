@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, X } from 'lucide-react';
+import { Search, X, Sparkles } from 'lucide-react';
 import { formatCategory } from '@/lib/utils';
 
 interface SearchEntry {
@@ -12,8 +12,16 @@ interface SearchEntry {
   summary?: string;
 }
 
+interface NeighborNode {
+  slug: string;
+  title: string;
+  category: string;
+  score: number;
+}
+
 interface SearchBarProps {
   entries: SearchEntry[];
+  neighborsMap?: Record<string, NeighborNode[]>;
 }
 
 function escapeRegex(str: string) {
@@ -36,22 +44,47 @@ function Highlight({ text, query }: { text: string; query: string }) {
   );
 }
 
-export default function SearchBar({ entries }: SearchBarProps) {
+export default function SearchBar({ entries, neighborsMap }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
+  const [semanticMode, setSemanticMode] = useState(false);
 
   const results = useMemo(() => {
     if (!query.trim()) return [];
     const q = query.toLowerCase();
-    return entries
-      .filter(
-        (e) =>
-          e.title.toLowerCase().includes(q) ||
-          e.category.toLowerCase().includes(q) ||
-          (e.summary?.toLowerCase().includes(q) ?? false)
-      )
-      .slice(0, 10);
-  }, [query, entries]);
+
+    // 1. Keyword matches
+    const keywordMatches = entries.filter(
+      (e) =>
+        e.title.toLowerCase().includes(q) ||
+        e.category.toLowerCase().includes(q) ||
+        (e.summary?.toLowerCase().includes(q) ?? false)
+    );
+
+    if (!semanticMode || !neighborsMap) {
+      return keywordMatches.slice(0, 10).map((e) => ({ ...e, source: 'keyword' as const }));
+    }
+
+    // 2. Semantic expansion
+    const seen = new Set<string>(keywordMatches.map((e) => e.slug));
+    const expanded: Array<SearchEntry & { source: 'keyword' | 'semantic'; score?: number }> =
+      keywordMatches.map((e) => ({ ...e, source: 'keyword' as const }));
+
+    for (const match of keywordMatches.slice(0, 5)) {
+      const neighbors = neighborsMap[match.slug];
+      if (!neighbors) continue;
+      for (const n of neighbors.slice(0, 3)) {
+        if (seen.has(n.slug)) continue;
+        seen.add(n.slug);
+        const entry = entries.find((e) => e.slug === n.slug);
+        if (entry) {
+          expanded.push({ ...entry, source: 'semantic', score: n.score });
+        }
+      }
+    }
+
+    return expanded.slice(0, 12);
+  }, [query, entries, semanticMode, neighborsMap]);
 
   const showResults = focused && query.trim().length > 0;
 
@@ -74,6 +107,20 @@ export default function SearchBar({ entries }: SearchBarProps) {
           onBlur={() => setTimeout(() => setFocused(false), 150)}
           className="flex-1 bg-transparent text-sm font-normal outline-none placeholder:text-muted-foreground/70 placeholder:font-light focus-ring"
         />
+        {neighborsMap && (
+          <button
+            onClick={() => setSemanticMode(!semanticMode)}
+            className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-all duration-200 ${
+              semanticMode
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+            }`}
+            title={semanticMode ? 'Semantic expansion ON' : 'Semantic expansion OFF'}
+          >
+            <Sparkles className="h-3 w-3" />
+            {semanticMode ? 'Semantic' : 'Keyword'}
+          </button>
+        )}
         {query && (
           <button
             onClick={() => setQuery('')}
@@ -90,23 +137,33 @@ export default function SearchBar({ entries }: SearchBarProps) {
             <div className="max-h-96 overflow-y-auto py-2">
               {results.map((entry) => (
                 <Link
-                  key={entry.slug}
+                  key={`${entry.slug}-${entry.source}`}
                   href={`/wiki/${entry.slug}`}
                   className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-secondary"
                   onMouseDown={(e) => e.preventDefault()}
                 >
                   <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium text-foreground truncate">
-                      <Highlight text={entry.title} query={query} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm font-medium text-foreground truncate">
+                        <Highlight text={entry.title} query={query} />
+                      </div>
+                      {entry.source === 'semantic' && (
+                        <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                          semantic
+                        </span>
+                      )}
                     </div>
                     {entry.summary && (
                       <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
                         <Highlight text={entry.summary} query={query} />
                       </p>
                     )}
-                    <div className="mt-1 text-xs text-muted-foreground/70">
-                      {formatCategory(entry.category)}
+                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground/70">
+                      <span>{formatCategory(entry.category)}</span>
+                      {entry.source === 'semantic' && entry.score && (
+                        <span className="tabular-nums">{(entry.score * 100).toFixed(0)}% match</span>
+                      )}
                     </div>
                   </div>
                 </Link>

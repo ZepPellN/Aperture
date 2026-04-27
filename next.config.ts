@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   // Keeping it active during `next dev` causes chunk re-evaluation issues
   // and can trigger CSP errors on navigation.
   ...(process.env.NODE_ENV === 'production' ? { output: 'export', distDir: 'dist' } : {}),
+  devIndicators: false,
   images: {
     unoptimized: true,
   },

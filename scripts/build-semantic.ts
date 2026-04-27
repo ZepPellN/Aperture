@@ -7,6 +7,7 @@ import { UMAP } from 'umap-js';
 const QMD_DB = process.env.QMD_INDEX || join(homedir(), '.cache', 'qmd', 'index.sqlite');
 const LAYOUT_OUTPUT = join(process.cwd(), 'lib', 'semantic-layout.json');
 const NEIGHBORS_OUTPUT = join(process.cwd(), 'lib', 'semantic-neighbors.json');
+const CLUSTERS_OUTPUT = join(process.cwd(), 'lib', 'semantic-clusters.json');
 
 interface SemanticLayout {
   [slug: string]: { x: number; y: number };
@@ -19,6 +20,18 @@ interface SemanticNeighbor {
 
 interface SemanticNeighbors {
   [slug: string]: SemanticNeighbor[];
+}
+
+interface Cluster {
+  id: number;
+  centroidX: number;
+  centroidY: number;
+  members: string[];
+}
+
+interface ClustersData {
+  clusters: Cluster[];
+  unclustered: string[];
 }
 
 interface DocEmbedding {
@@ -261,6 +274,79 @@ function computeNeighbors(embeddings: DocEmbedding[], topK = 5): SemanticNeighbo
   return neighbors;
 }
 
+function computeClusters(layout: SemanticLayout, eps = 12, minPoints = 3): ClustersData {
+  const slugs = Object.keys(layout);
+  const n = slugs.length;
+  const visited = new Set<string>();
+  const assigned = new Set<string>();
+  const clusters: Cluster[] = [];
+  let clusterId = 0;
+
+  function regionQuery(slug: string): string[] {
+    const { x, y } = layout[slug];
+    const neighbors: string[] = [];
+    for (const other of slugs) {
+      if (other === slug) continue;
+      const dx = layout[other].x - x;
+      const dy = layout[other].y - y;
+      if (Math.sqrt(dx * dx + dy * dy) <= eps) {
+        neighbors.push(other);
+      }
+    }
+    return neighbors;
+  }
+
+  for (const slug of slugs) {
+    if (visited.has(slug)) continue;
+    visited.add(slug);
+
+    const neighbors = regionQuery(slug);
+    if (neighbors.length < minPoints) continue;
+
+    // Start a new cluster
+    const members = new Set<string>([slug, ...neighbors]);
+    const queue = [...neighbors];
+
+    for (let i = 0; i < queue.length; i++) {
+      const p = queue[i];
+      if (visited.has(p)) continue;
+      visited.add(p);
+
+      const pNeighbors = regionQuery(p);
+      if (pNeighbors.length >= minPoints) {
+        for (const q of pNeighbors) {
+          if (!members.has(q)) {
+            members.add(q);
+            queue.push(q);
+          }
+        }
+      }
+    }
+
+    const memberList = Array.from(members);
+    let sumX = 0;
+    let sumY = 0;
+    for (const m of memberList) {
+      sumX += layout[m].x;
+      sumY += layout[m].y;
+    }
+
+    clusters.push({
+      id: clusterId++,
+      centroidX: sumX / memberList.length,
+      centroidY: sumY / memberList.length,
+      members: memberList,
+    });
+
+    for (const m of memberList) {
+      assigned.add(m);
+    }
+  }
+
+  const unclustered = slugs.filter((s) => !assigned.has(s));
+  return { clusters, unclustered };
+}
+
 function main() {
   console.log('[semantic] Starting semantic layout build...');
 
@@ -269,6 +355,7 @@ function main() {
     console.log('[semantic] No embeddings loaded. Writing empty files.');
     writeFileSync(LAYOUT_OUTPUT, JSON.stringify({}, null, 2));
     writeFileSync(NEIGHBORS_OUTPUT, JSON.stringify({}, null, 2));
+    writeFileSync(CLUSTERS_OUTPUT, JSON.stringify({ clusters: [], unclustered: [] }, null, 2));
     return;
   }
 
@@ -280,6 +367,11 @@ function main() {
   const neighbors = computeNeighbors(embeddings, 5);
   writeFileSync(NEIGHBORS_OUTPUT, JSON.stringify(neighbors, null, 2));
   console.log(`[semantic] Wrote ${Object.keys(neighbors).length} neighbor maps to ${NEIGHBORS_OUTPUT}`);
+
+  console.log('[semantic] Computing semantic clusters...');
+  const clusters = computeClusters(layout, 7, 4);
+  writeFileSync(CLUSTERS_OUTPUT, JSON.stringify(clusters, null, 2));
+  console.log(`[semantic] Wrote ${clusters.clusters.length} clusters (${clusters.unclustered.length} unclustered) to ${CLUSTERS_OUTPUT}`);
 }
 
 main();
