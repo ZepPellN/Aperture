@@ -43,6 +43,7 @@ next-env.d.ts
 
 # temp files
 /temp/
+/web-articles/
 
 # Generated semantic data (regenerated via `npm run build:semantic`)
 /lib/semantic-layout.json
