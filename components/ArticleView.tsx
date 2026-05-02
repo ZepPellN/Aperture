@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import type { WikiArticle } from '@/lib/wiki-loader';
-import { ArrowLeft, Clock, Calendar, Hash, GitBranch, FileText, ExternalLink } from 'lucide-react';
+import type { WikiArticle, WikiEvolutionEvent, WikiEvolutionRef } from '@/lib/wiki-loader';
+import { ArrowLeft, Clock, Calendar, Hash, GitBranch, FileText, ExternalLink, History } from 'lucide-react';
 import { formatCategory } from '@/lib/utils';
 import SemanticTrail from '@/components/SemanticTrail';
 
@@ -21,6 +21,40 @@ function contributionClass(contribution?: string) {
   if (contribution === 'medium') return 'border-border bg-secondary text-foreground';
   if (contribution === 'low') return 'border-border bg-muted text-muted-foreground';
   return 'border-border bg-card text-muted-foreground';
+}
+
+function formatEvolutionType(type: WikiEvolutionEvent['type']) {
+  const labels: Record<WikiEvolutionEvent['type'], string> = {
+    created: 'created',
+    absorbed: 'absorbed',
+    merged: 'merged',
+    split: 'split',
+    renamed: 'renamed',
+    refined: 'refined',
+    linked: 'linked',
+  };
+
+  return labels[type];
+}
+
+function renderEvolutionRefs(refs: WikiEvolutionRef[]) {
+  return refs.map((ref, index) => {
+    const label = ref.title || ref.slug;
+    const separator = index > 0 ? ', ' : '';
+
+    if (ref.slug.startsWith('raw/')) {
+      return <span key={ref.slug}>{separator}{label}</span>;
+    }
+
+    return (
+      <span key={ref.slug}>
+        {separator}
+        <Link className="text-foreground hover:text-primary" href={`/wiki/${ref.slug}`}>
+          {label}
+        </Link>
+      </span>
+    );
+  });
 }
 
 export default function ArticleView({ article, backlinks, semanticTrail }: ArticleViewProps) {
@@ -154,6 +188,59 @@ export default function ArticleView({ article, backlinks, semanticTrail }: Artic
               );
             })}
           </ul>
+        </section>
+      )}
+
+      {/* Evolution */}
+      {article.evolution.length > 0 && (
+        <section className="mt-10 border-t border-border pt-6">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-medium text-heading">
+              Evolution
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {article.evolution.length} event{article.evolution.length === 1 ? '' : 's'}
+            </span>
+          </div>
+          <ol className="space-y-3">
+            {article.evolution.map((event) => (
+              <li
+                key={`${event.date}:${event.type}:${event.summary}`}
+                className="rounded-lg border border-border bg-card px-3 py-3"
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <History className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  <time dateTime={event.date}>{event.date}</time>
+                  <span className="rounded-full border border-border bg-secondary px-2 py-0.5 font-medium text-foreground">
+                    {formatEvolutionType(event.type)}
+                  </span>
+                </div>
+                {event.title && (
+                  <h3 className="mt-2 text-sm font-medium text-heading">{event.title}</h3>
+                )}
+                <p className="mt-1 text-sm leading-6 text-foreground">{event.summary}</p>
+                {(event.from || event.to) && (
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    {event.from && (
+                      <span>
+                        From {renderEvolutionRefs(event.from)}
+                      </span>
+                    )}
+                    {event.to && (
+                      <span>
+                        To {renderEvolutionRefs(event.to)}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {event.sources && event.sources.length > 0 && (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    Sources: {event.sources.join(' · ')}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
         </section>
       )}
 

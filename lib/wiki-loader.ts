@@ -16,6 +16,7 @@ export interface WikiArticle {
   html: string;
   frontmatter: Record<string, unknown>;
   sources: WikiSource[];
+  evolution: WikiEvolutionEvent[];
   readingTime: number;
   wordCount: number;
   lastModified?: string;
@@ -52,6 +53,21 @@ interface SourceContribution {
   contribution: SourceContributionLevel;
   sections: string[];
   summary?: string;
+}
+
+export interface WikiEvolutionRef {
+  slug: string;
+  title?: string;
+}
+
+export interface WikiEvolutionEvent {
+  date: string;
+  type: 'created' | 'absorbed' | 'merged' | 'split' | 'renamed' | 'refined' | 'linked';
+  summary: string;
+  title?: string;
+  from?: WikiEvolutionRef[];
+  to?: WikiEvolutionRef[];
+  sources?: string[];
 }
 
 const WIKI_DIR = process.env.WIKI_ROOT
@@ -322,6 +338,92 @@ function sourcesFromContributions(contributions: SourceContribution[]): WikiSour
   }));
 }
 
+function parseEvolutionRefs(value: unknown): WikiEvolutionRef[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const refs = value
+    .map((item): WikiEvolutionRef | null => {
+      if (typeof item === 'string') {
+        const slug = normalizeWikiPageRef(item);
+        return slug ? { slug } : null;
+      }
+
+      if (!item || typeof item !== 'object' || !('slug' in item)) return null;
+      const raw = item as { slug?: unknown; title?: unknown };
+      const slug = typeof raw.slug === 'string' ? normalizeWikiPageRef(raw.slug) : '';
+      if (!slug) return null;
+
+      return {
+        slug,
+        title: typeof raw.title === 'string' ? raw.title : undefined,
+      };
+    })
+    .filter((ref): ref is WikiEvolutionRef => ref !== null);
+
+  return refs.length > 0 ? refs : undefined;
+}
+
+function loadEvolution(slug: string): WikiEvolutionEvent[] {
+  const path = join(WIKI_DIR, '_evolution.json');
+  if (!existsSync(path)) return [];
+
+  try {
+    const raw = readFileSync(path, 'utf-8');
+    const data = JSON.parse(raw) as Record<string, unknown>;
+    const entries = data[slug];
+    if (!Array.isArray(entries)) return [];
+
+    return entries
+      .map((entry): WikiEvolutionEvent | null => {
+        if (!entry || typeof entry !== 'object') return null;
+        const rawEntry = entry as {
+          date?: unknown;
+          type?: unknown;
+          summary?: unknown;
+          title?: unknown;
+          from?: unknown;
+          to?: unknown;
+          sources?: unknown;
+        };
+        const date = typeof rawEntry.date === 'string' ? rawEntry.date : '';
+        const summary = typeof rawEntry.summary === 'string' ? rawEntry.summary : '';
+        if (!date || !summary) return null;
+
+        return {
+          date,
+          type: parseEvolutionType(rawEntry.type),
+          summary,
+          title: typeof rawEntry.title === 'string' ? rawEntry.title : undefined,
+          from: parseEvolutionRefs(rawEntry.from),
+          to: parseEvolutionRefs(rawEntry.to),
+          sources: Array.isArray(rawEntry.sources)
+            ? rawEntry.sources.map(String).filter(Boolean)
+            : undefined,
+        };
+      })
+      .filter((event): event is WikiEvolutionEvent => event !== null)
+      .sort((a, b) => b.date.localeCompare(a.date));
+  } catch {
+    return [];
+  }
+}
+
+function parseEvolutionType(value: unknown): WikiEvolutionEvent['type'] {
+  if (
+    value === 'created' ||
+    value === 'absorbed' ||
+    value === 'merged' ||
+    value === 'split' ||
+    value === 'renamed' ||
+    value === 'refined' ||
+    value === 'linked'
+  ) {
+    return value;
+  }
+
+  return 'refined';
+}
+
 function dedupeSources(sources: WikiSource[]): WikiSource[] {
   const seen = new Set<string>();
   return sources.filter((source) => {
@@ -406,6 +508,7 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
     ...sourcesFromFrontmatter(parsed.data.sources),
     ...sourcesFromContributions(sourceContributions),
   ]), sourceContributions);
+  const evolution = loadEvolution(slug);
   const displayContent = stripSourcesSection(content);
   const html = await compileMarkdown(displayContent);
   const words = displayContent.split(/\s+/).filter(Boolean).length;
@@ -422,6 +525,7 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
     html,
     frontmatter: parsed.data,
     sources,
+    evolution,
     readingTime: estimateReadingTime(words),
     wordCount: words,
     lastModified: toDateString(parsed.data.updated || parsed.data.date),

@@ -1,0 +1,17 @@
+{
+  "concepts/agentic-coding": [
+    {
+      "date": "2026-05-02",
+      "type": "absorbed",
+      "title": "Seed article absorbed into concept page",
+      "summary": "The example source became the first traceable contribution for the agentic coding concept page, establishing the central definition and implementation sections.",
+      "from": [
+        {
+          "slug": "raw/to-learn/example-article.md",
+          "title": "The Rise of Agentic Coding"
+        }
+      ],
+      "sources": ["raw/to-learn/example-article.md"]
+    }
+  ]
+}

@@ -159,6 +159,39 @@ Contribution levels:
 - `medium`: adds important examples, counterpoints, or section-level support.
 - `low`: contributes metadata, minor context, or a small supporting detail.
 
+Update `wiki/_evolution.json` when the accepted change creates a meaningful
+lineage event: a new page is created, a raw source is absorbed, a page is merged
+into another page, or a page is split/renamed/refined in a non-trivial way.
+
+```json
+{
+  "section/page": [
+    {
+      "date": "2026-05-02",
+      "type": "absorbed",
+      "title": "Source absorbed into section",
+      "summary": "Added the source's main claim and example set to the page.",
+      "from": [
+        {
+          "slug": "raw/path/to/source.md",
+          "title": "Source Title"
+        }
+      ],
+      "to": [
+        {
+          "slug": "section/related-page",
+          "title": "Related Page"
+        }
+      ],
+      "sources": ["raw/path/to/source.md"]
+    }
+  ]
+}
+```
+
+Allowed evolution types: `created`, `absorbed`, `merged`, `split`, `renamed`,
+`refined`, `linked`. Omit `from` or `to` when they do not apply.
+
 Also append to `wiki/log.md`:
 
 ```markdown
@@ -195,5 +228,7 @@ Bad proposals:
 - Confirmed pages updated.
 - `## Sources` updated.
 - `_absorb_log.json` updated with `status: triaged`.
+- `_source_contributions.json` updated when source contribution is clear.
+- `_evolution.json` updated when the write changes page lineage.
 - `wiki/log.md` updated.
 - Index/backlinks rebuilt when needed.
