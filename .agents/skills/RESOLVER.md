@@ -24,6 +24,7 @@ Aperture ships its own copy of the wiki management skills for open-source distri
 
 - **`wiki-inbox/SKILL.md`** — Scan raw/ and ingest unabsorbed files
 - **`wiki-ingest/SKILL.md`** — Router to specialized wiki sub-skills
+- **`wiki-triage/SKILL.md`** — Interactively review one high-value raw source and confirm save/skip decisions before writing
 - **`wiki-absorb/SKILL.md`** — Re-process raw files to update/create wiki articles
 - **`wiki-breakdown/SKILL.md`** — Find and create missing articles
 - **`wiki-cleanup/SKILL.md`** — Audit and enrich articles with parallel subagents
