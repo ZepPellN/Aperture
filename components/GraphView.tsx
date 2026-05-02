@@ -6,11 +6,11 @@ import { UndirectedGraph } from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import type { GraphData } from '@/lib/graph-builder';
 import Link from 'next/link';
-import { ArrowLeft, Info } from 'lucide-react';
 import { formatCategory } from '@/lib/utils';
 
 interface GraphViewProps {
   data: GraphData;
+  focusSlug?: string;
 }
 
 // Theme-aware palettes
@@ -42,7 +42,7 @@ function useTheme() {
   return isDark;
 }
 
-export default function GraphView({ data }: GraphViewProps) {
+export default function GraphView({ data, focusSlug }: GraphViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -59,12 +59,13 @@ export default function GraphView({ data }: GraphViewProps) {
     const graph = new UndirectedGraph();
 
     for (const node of data.nodes) {
+      const isFocused = focusSlug === node.id;
       graph.addNode(node.id, {
         label: node.label,
         x: node.x,
         y: node.y,
-        size: node.size,
-        color: node.color,
+        size: isFocused ? node.size * 1.5 : node.size,
+        color: isFocused ? '#b45309' : node.color,
       });
     }
 
@@ -106,11 +107,22 @@ export default function GraphView({ data }: GraphViewProps) {
 
     sigmaRef.current = sigma;
 
+    if (focusSlug && graph.hasNode(focusSlug)) {
+      const focusedNode = graph.getNodeAttributes(focusSlug) as { x: number; y: number };
+      requestAnimationFrame(() => {
+        setSelected(focusSlug);
+        sigma.getCamera().animate(
+          { x: focusedNode.x, y: focusedNode.y, ratio: 0.35 },
+          { duration: 600 }
+        );
+      });
+    }
+
     return () => {
       sigma.kill();
       sigmaRef.current = null;
     };
-  }, [data, isDark]);
+  }, [data, isDark, focusSlug]);
 
   const theme = PALETTE[isDark ? 'dark' : 'light'];
 

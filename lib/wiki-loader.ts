@@ -1,5 +1,5 @@
-import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
-import { join, relative, basename, extname, dirname } from 'path';
+import { readFileSync, readdirSync, existsSync } from 'fs';
+import { join, relative, basename, dirname } from 'path';
 import matter from 'gray-matter';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
@@ -14,7 +14,8 @@ export interface WikiArticle {
   title: string;
   content: string;
   html: string;
-  frontmatter: Record<string, any>;
+  frontmatter: Record<string, unknown>;
+  sources: WikiSource[];
   readingTime: number;
   wordCount: number;
   lastModified?: string;
@@ -32,6 +33,13 @@ export interface WikiLink {
   from: string;
   to: string;
   label: string;
+}
+
+export interface WikiSource {
+  path: string;
+  label: string;
+  href?: string;
+  origin: 'body' | 'absorb_log' | 'frontmatter';
 }
 
 const WIKI_DIR = process.env.WIKI_ROOT
@@ -102,6 +110,162 @@ export function transformWikilinks(markdown: string): { html: string; links: Wik
   return { html, links };
 }
 
+function normalizeSourcePath(path: string): string {
+  return path.replace(/^wiki\//, '').replace(/\.md$/, '');
+}
+
+function sourceHref(path: string): string | undefined {
+  if (/^https?:\/\//.test(path)) return path;
+  const normalized = normalizeSourcePath(path);
+  if (path.startsWith('wiki/')) return `/wiki/${normalized}`;
+  if (!path.startsWith('raw/')) return `/wiki/${normalized}`;
+  return undefined;
+}
+
+function findSourcesSection(content: string): { section: string; start: number; end: number } | null {
+  const headingPattern = /^##\s+Sources?\s*$/im;
+  const match = headingPattern.exec(content);
+  if (!match) return null;
+
+  const start = match.index;
+  const afterHeading = start + match[0].length;
+  const rest = content.slice(afterHeading);
+  const nextHeading = /\n#{1,6}\s+\S/.exec(rest);
+  const end = nextHeading ? afterHeading + nextHeading.index : content.length;
+
+  return {
+    section: content.slice(afterHeading, end),
+    start,
+    end,
+  };
+}
+
+export function stripSourcesSection(content: string): string {
+  const sourcesSection = findSourcesSection(content);
+  if (!sourcesSection) return content;
+  return `${content.slice(0, sourcesSection.start).trimEnd()}\n${content.slice(sourcesSection.end).trimStart()}`.trim();
+}
+
+export function extractSourcesFromContent(content: string): WikiSource[] {
+  const sourcesSection = findSourcesSection(content);
+  if (!sourcesSection) return [];
+
+  const sources: WikiSource[] = [];
+  const seen = new Set<string>();
+  const section = sourcesSection.section;
+
+  const wikilinkPattern = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+  for (const match of section.matchAll(wikilinkPattern)) {
+    const path = match[1].trim();
+    const label = (match[2] || match[1]).trim();
+    if (!path || seen.has(path)) continue;
+    seen.add(path);
+    sources.push({
+      path,
+      label,
+      href: sourceHref(path),
+      origin: 'body',
+    });
+  }
+
+  const markdownLinkPattern = /\[([^\]]+)\]\(([^\)]+)\)/g;
+  for (const match of section.matchAll(markdownLinkPattern)) {
+    const label = match[1].trim();
+    const path = match[2].trim();
+    if (!path || seen.has(path)) continue;
+    seen.add(path);
+    sources.push({
+      path,
+      label,
+      href: sourceHref(path),
+      origin: 'body',
+    });
+  }
+
+  return sources;
+}
+
+function normalizeWikiPageRef(ref: string): string {
+  return ref.replace(/^wiki\//, '').replace(/\.md$/, '');
+}
+
+function loadAbsorbLogSources(slug: string): WikiSource[] {
+  const logPath = join(WIKI_DIR, '_absorb_log.json');
+  if (!existsSync(logPath)) return [];
+
+  try {
+    const raw = readFileSync(logPath, 'utf-8');
+    const log = JSON.parse(raw) as Record<string, unknown>;
+    const sources: WikiSource[] = [];
+    const seen = new Set<string>();
+
+    for (const [sourcePath, entry] of Object.entries(log)) {
+      if (!entry || typeof entry !== 'object' || !('wiki_pages' in entry)) continue;
+      const wikiPages = (entry as { wiki_pages?: unknown }).wiki_pages;
+      if (!Array.isArray(wikiPages)) continue;
+
+      const touchesSlug = wikiPages
+        .map((page: unknown) => normalizeWikiPageRef(String(page)))
+        .includes(slug);
+
+      if (!touchesSlug || seen.has(sourcePath)) continue;
+      seen.add(sourcePath);
+      sources.push({
+        path: sourcePath,
+        label: basename(sourcePath).replace(/\.md$/, ''),
+        href: sourceHref(sourcePath),
+        origin: 'absorb_log',
+      });
+    }
+
+    return sources;
+  } catch {
+    return [];
+  }
+}
+
+function sourcesFromFrontmatter(value: unknown): WikiSource[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item): WikiSource | null => {
+      if (typeof item === 'string') {
+        return {
+          path: item,
+          label: basename(item).replace(/\.md$/, ''),
+          href: sourceHref(item),
+          origin: 'frontmatter',
+        };
+      }
+
+      if (item && typeof item === 'object' && 'path' in item) {
+        const path = String((item as { path: unknown }).path);
+        return {
+          path,
+          label:
+            'label' in item
+              ? String((item as { label: unknown }).label)
+              : basename(path).replace(/\.md$/, ''),
+          href: sourceHref(path),
+          origin: 'frontmatter',
+        };
+      }
+
+      return null;
+    })
+    .filter((source): source is WikiSource => source !== null);
+}
+
+function dedupeSources(sources: WikiSource[]): WikiSource[] {
+  const seen = new Set<string>();
+  return sources.filter((source) => {
+    const key = source.path;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export async function compileMarkdown(content: string): Promise<string> {
   const { html: transformed } = transformWikilinks(content);
 
@@ -125,28 +289,38 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
   if (!existsSync(filePath)) return null;
 
   const raw = readFileSync(filePath, 'utf-8');
-  let parsed: { data: Record<string, any>; content: string };
+  let parsed: { data: Record<string, unknown>; content: string };
 
   try {
     parsed = matter(raw);
-  } catch (err) {
+  } catch {
     // Fallback: treat entire file as content if frontmatter parsing fails
     console.warn(`[Aperture] Failed to parse frontmatter for ${slug}, using fallback.`);
     parsed = { data: {}, content: raw };
   }
 
   const content = parsed.content;
-  const html = await compileMarkdown(content);
-  const words = content.split(/\s+/).length;
+  const sources = dedupeSources([
+    ...extractSourcesFromContent(content),
+    ...loadAbsorbLogSources(slug),
+    ...sourcesFromFrontmatter(parsed.data.sources),
+  ]);
+  const displayContent = stripSourcesSection(content);
+  const html = await compileMarkdown(displayContent);
+  const words = displayContent.split(/\s+/).filter(Boolean).length;
   const category = dirname(slug) || 'uncategorized';
+  const title = typeof parsed.data.title === 'string'
+    ? parsed.data.title
+    : basename(slug).replace(/-/g, ' ');
 
   return {
     slug,
     category,
-    title: parsed.data.title || basename(slug).replace(/-/g, ' '),
+    title,
     content,
     html,
     frontmatter: parsed.data,
+    sources,
     readingTime: estimateReadingTime(words),
     wordCount: words,
     lastModified: toDateString(parsed.data.updated || parsed.data.date),

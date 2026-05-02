@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { GitBranch, Map, Globe, Compass } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import type { GraphData } from '@/lib/graph-builder';
 
 const GraphView = dynamic(() => import('@/components/GraphView'), {
@@ -20,6 +21,7 @@ const NestGraph = dynamic(() => import('@/components/NestGraph'), {
 
 interface GraphSwitcherProps {
   data: GraphData;
+  focusSlug?: string;
 }
 
 function GraphSkeleton() {
@@ -37,7 +39,9 @@ function GraphSkeleton() {
   );
 }
 
-export default function GraphSwitcher({ data }: GraphSwitcherProps) {
+export default function GraphSwitcher({ data, focusSlug }: GraphSwitcherProps) {
+  const searchParams = useSearchParams();
+  const activeFocusSlug = focusSlug ?? searchParams.get('focus') ?? undefined;
   const [view, setView] = useState<'network' | 'topo' | 'semantic' | 'nest'>('network');
   const [bfcacheKey, setBfcacheKey] = useState(0);
 
@@ -126,7 +130,7 @@ export default function GraphSwitcher({ data }: GraphSwitcherProps) {
       </div>
 
       {view === 'network' ? (
-        <GraphView key={bfcacheKey} data={data} />
+        <GraphView key={bfcacheKey} data={data} focusSlug={activeFocusSlug} />
       ) : view === 'topo' ? (
         <KnowledgeMap key={bfcacheKey} data={data} layoutMode="force" />
       ) : view === 'semantic' ? (
