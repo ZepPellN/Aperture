@@ -46,6 +46,16 @@ function timeBucket(dateStr: string): string {
   return 'Earlier';
 }
 
+function formatUpdatedDate(dateStr?: string): string {
+  if (!dateStr) return 'No date';
+  const date = new Date(`${dateStr}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
 export default function HomeContent({
   index,
   stats,
@@ -201,10 +211,16 @@ export default function HomeContent({
                 className="group flex flex-col rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-sm"
               >
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold tracking-tight text-heading">
-                    {formatCategory(category)}
-                  </h3>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-semibold tracking-tight text-heading">
+                      {formatCategory(category)}
+                    </h3>
+                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      <span>Latest {formatUpdatedDate(entries[0]?.updated)}</span>
+                    </div>
+                  </div>
+                  <span className="ml-3 shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
                     {entries.length}
                   </span>
                 </div>
@@ -217,7 +233,7 @@ export default function HomeContent({
                       className="block truncate rounded-md px-2 py-1.5 text-sm font-normal text-foreground transition-colors hover:bg-secondary"
                       title={entry.title}
                     >
-                      {entry.title}
+                      <span className="truncate">{entry.title}</span>
                     </Link>
                   ))}
                 </div>
