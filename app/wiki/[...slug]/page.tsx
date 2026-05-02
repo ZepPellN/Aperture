@@ -2,6 +2,7 @@ import WikiLayout from '@/components/WikiLayout';
 import ArticleView from '@/components/ArticleView';
 import { loadArticle, loadAllArticles, getBacklinks, getWikiFiles, filePathToSlug, getWikiDir } from '@/lib/wiki-loader';
 import { getNeighborsFor } from '@/lib/semantic-neighbors';
+import { buildLocalGraph } from '@/lib/graph-builder';
 import { notFound } from 'next/navigation';
 
 interface WikiPageProps {
@@ -60,10 +61,16 @@ export default async function WikiPage({ params }: WikiPageProps) {
       };
     })
     .filter((n): n is NonNullable<typeof n> => n !== null);
+  const miniGraph = buildLocalGraph(allArticles, slugStr);
 
   return (
     <WikiLayout>
-      <ArticleView article={article} backlinks={backlinks} semanticTrail={semanticTrail} />
+      <ArticleView
+        article={article}
+        backlinks={backlinks}
+        semanticTrail={semanticTrail}
+        miniGraph={miniGraph}
+      />
     </WikiLayout>
   );
 }

@@ -1,4 +1,4 @@
-import type { WikiArticle, WikiLink } from './wiki-loader';
+import type { WikiArticle } from './wiki-loader';
 import { transformWikilinks } from './wiki-loader';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
@@ -123,4 +123,45 @@ export function buildGraph(articles: WikiArticle[]): GraphData {
   }
 
   return { nodes, edges };
+}
+
+export function buildLocalGraph(
+  articles: WikiArticle[],
+  focusSlug: string,
+  maxNeighbors = 10
+): GraphData {
+  const graph = buildGraph(articles);
+  const focusNode = graph.nodes.find((node) => node.id === focusSlug);
+  if (!focusNode) return { nodes: [], edges: [] };
+
+  const incidentEdges = graph.edges.filter(
+    (edge) => edge.source === focusSlug || edge.target === focusSlug
+  );
+  const neighborIds = Array.from(
+    new Set(
+      incidentEdges.map((edge) => (edge.source === focusSlug ? edge.target : edge.source))
+    )
+  ).slice(0, maxNeighbors);
+  const localIds = new Set([focusSlug, ...neighborIds]);
+  const localNodes = graph.nodes
+    .filter((node) => localIds.has(node.id))
+    .map((node) => {
+      if (node.id === focusSlug) {
+        return { ...node, x: 50, y: 50, size: Math.max(node.size, 7) };
+      }
+
+      const neighborIndex = Math.max(0, neighborIds.indexOf(node.id));
+      const angle = (Math.PI * 2 * neighborIndex) / Math.max(1, neighborIds.length);
+      return {
+        ...node,
+        x: 50 + Math.cos(angle) * 34,
+        y: 50 + Math.sin(angle) * 30,
+        size: Math.max(4, Math.min(node.size, 7)),
+      };
+    });
+  const localEdges = incidentEdges.filter(
+    (edge) => localIds.has(edge.source) && localIds.has(edge.target)
+  );
+
+  return { nodes: localNodes, edges: localEdges };
 }
