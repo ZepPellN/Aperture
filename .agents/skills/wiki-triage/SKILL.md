@@ -137,6 +137,28 @@ Update `wiki/_absorb_log.json` after successful writes:
 }
 ```
 
+Update `wiki/_source_contributions.json` for each target page. Keep it keyed by
+wiki slug, sorted by contribution strength:
+
+```json
+{
+  "section/page": [
+    {
+      "source": "raw/path/to/source.md",
+      "contribution": "high",
+      "sections": ["## Key points"],
+      "summary": "Added the central claim and supporting evidence."
+    }
+  ]
+}
+```
+
+Contribution levels:
+
+- `high`: creates or rewrites the page's central claim, definition, or main evidence.
+- `medium`: adds important examples, counterpoints, or section-level support.
+- `low`: contributes metadata, minor context, or a small supporting detail.
+
 Also append to `wiki/log.md`:
 
 ```markdown

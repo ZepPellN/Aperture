@@ -12,6 +12,17 @@ interface ArticleViewProps {
   semanticTrail?: { slug: string; title: string; category: string; score: number }[];
 }
 
+function formatSourceOrigin(origin: string) {
+  return origin === 'absorb_log' ? 'absorb log' : origin;
+}
+
+function contributionClass(contribution?: string) {
+  if (contribution === 'high') return 'border-primary/20 bg-primary/10 text-primary';
+  if (contribution === 'medium') return 'border-border bg-secondary text-foreground';
+  if (contribution === 'low') return 'border-border bg-muted text-muted-foreground';
+  return 'border-border bg-card text-muted-foreground';
+}
+
 export default function ArticleView({ article, backlinks, semanticTrail }: ArticleViewProps) {
   return (
     <div className="mx-auto max-w-3xl">
@@ -85,13 +96,30 @@ export default function ArticleView({ article, backlinks, semanticTrail }: Artic
           <ul className="divide-y divide-border rounded-lg border border-border bg-card">
             {article.sources.map((source) => {
               const row = (
-                <span className="flex min-w-0 items-center justify-between gap-3 px-3 py-2.5 text-sm">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <FileText className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
-                    <span className="truncate text-foreground">{source.label}</span>
+                <span className="flex min-w-0 items-start justify-between gap-3 px-3 py-2.5 text-sm">
+                  <span className="flex min-w-0 items-start gap-2">
+                    <FileText className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                    <span className="min-w-0">
+                      <span className="block truncate text-foreground">{source.label}</span>
+                      {source.summary && (
+                        <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                          {source.summary}
+                        </span>
+                      )}
+                      {source.sections && source.sections.length > 0 && (
+                        <span className="mt-1 block truncate text-xs text-muted-foreground">
+                          {source.sections.join(' · ')}
+                        </span>
+                      )}
+                    </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
-                    <span>{source.origin === 'absorb_log' ? 'absorb log' : source.origin}</span>
+                    {source.contribution && source.contribution !== 'unknown' && (
+                      <span className={`rounded-full border px-2 py-0.5 font-medium ${contributionClass(source.contribution)}`}>
+                        {source.contribution}
+                      </span>
+                    )}
+                    <span>{formatSourceOrigin(source.origin)}</span>
                     {source.href && <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />}
                   </span>
                 </span>

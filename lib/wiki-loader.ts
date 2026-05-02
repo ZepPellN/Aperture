@@ -39,7 +39,19 @@ export interface WikiSource {
   path: string;
   label: string;
   href?: string;
-  origin: 'body' | 'absorb_log' | 'frontmatter';
+  origin: 'body' | 'absorb_log' | 'frontmatter' | 'contribution';
+  contribution?: SourceContributionLevel;
+  sections?: string[];
+  summary?: string;
+}
+
+export type SourceContributionLevel = 'high' | 'medium' | 'low' | 'unknown';
+
+interface SourceContribution {
+  source: string;
+  contribution: SourceContributionLevel;
+  sections: string[];
+  summary?: string;
 }
 
 const WIKI_DIR = process.env.WIKI_ROOT
@@ -256,6 +268,60 @@ function sourcesFromFrontmatter(value: unknown): WikiSource[] {
     .filter((source): source is WikiSource => source !== null);
 }
 
+function parseContributionLevel(value: unknown): SourceContributionLevel {
+  if (value === 'high' || value === 'medium' || value === 'low') return value;
+  return 'unknown';
+}
+
+function loadSourceContributions(slug: string): SourceContribution[] {
+  const path = join(WIKI_DIR, '_source_contributions.json');
+  if (!existsSync(path)) return [];
+
+  try {
+    const raw = readFileSync(path, 'utf-8');
+    const data = JSON.parse(raw) as Record<string, unknown>;
+    const entries = data[slug];
+    if (!Array.isArray(entries)) return [];
+
+    return entries
+      .map((entry): SourceContribution | null => {
+        if (!entry || typeof entry !== 'object' || !('source' in entry)) return null;
+        const rawEntry = entry as {
+          source?: unknown;
+          contribution?: unknown;
+          sections?: unknown;
+          summary?: unknown;
+        };
+        const source = typeof rawEntry.source === 'string' ? rawEntry.source : '';
+        if (!source) return null;
+
+        return {
+          source,
+          contribution: parseContributionLevel(rawEntry.contribution),
+          sections: Array.isArray(rawEntry.sections)
+            ? rawEntry.sections.map(String).filter(Boolean)
+            : [],
+          summary: typeof rawEntry.summary === 'string' ? rawEntry.summary : undefined,
+        };
+      })
+      .filter((entry): entry is SourceContribution => entry !== null);
+  } catch {
+    return [];
+  }
+}
+
+function sourcesFromContributions(contributions: SourceContribution[]): WikiSource[] {
+  return contributions.map((entry) => ({
+    path: entry.source,
+    label: basename(entry.source).replace(/\.md$/, ''),
+    href: sourceHref(entry.source),
+    origin: 'contribution',
+    contribution: entry.contribution,
+    sections: entry.sections,
+    summary: entry.summary,
+  }));
+}
+
 function dedupeSources(sources: WikiSource[]): WikiSource[] {
   const seen = new Set<string>();
   return sources.filter((source) => {
@@ -264,6 +330,39 @@ function dedupeSources(sources: WikiSource[]): WikiSource[] {
     seen.add(key);
     return true;
   });
+}
+
+function enrichSourcesWithContributions(
+  sources: WikiSource[],
+  contributions: SourceContribution[]
+): WikiSource[] {
+  const contributionBySource = new Map(contributions.map((entry) => [entry.source, entry]));
+  const rank: Record<SourceContributionLevel, number> = {
+    high: 0,
+    medium: 1,
+    low: 2,
+    unknown: 3,
+  };
+
+  return sources
+    .map((source, index) => {
+      const contribution = contributionBySource.get(source.path);
+      return {
+        index,
+        source: {
+          ...source,
+          contribution: contribution?.contribution ?? source.contribution,
+          sections: contribution?.sections ?? source.sections,
+          summary: contribution?.summary ?? source.summary,
+        },
+      };
+    })
+    .sort((a, b) => {
+      const aRank = rank[a.source.contribution ?? 'unknown'];
+      const bRank = rank[b.source.contribution ?? 'unknown'];
+      return aRank === bRank ? a.index - b.index : aRank - bRank;
+    })
+    .map((entry) => entry.source);
 }
 
 export async function compileMarkdown(content: string): Promise<string> {
@@ -300,11 +399,13 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
   }
 
   const content = parsed.content;
-  const sources = dedupeSources([
+  const sourceContributions = loadSourceContributions(slug);
+  const sources = enrichSourcesWithContributions(dedupeSources([
     ...extractSourcesFromContent(content),
     ...loadAbsorbLogSources(slug),
     ...sourcesFromFrontmatter(parsed.data.sources),
-  ]);
+    ...sourcesFromContributions(sourceContributions),
+  ]), sourceContributions);
   const displayContent = stripSourcesSection(content);
   const html = await compileMarkdown(displayContent);
   const words = displayContent.split(/\s+/).filter(Boolean).length;

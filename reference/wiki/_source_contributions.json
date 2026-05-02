@@ -1,0 +1,10 @@
+{
+  "concepts/agentic-coding": [
+    {
+      "source": "raw/to-learn/example-article.md",
+      "contribution": "high",
+      "sections": ["## Core Principles", "## Leading Implementations"],
+      "summary": "Seeded the article's core definition, delegation model, feedback loop, and implementation examples."
+    }
+  ]
+}
