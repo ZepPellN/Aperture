@@ -2,11 +2,13 @@ import type { WikiArticle } from './wiki-loader';
 import { transformWikilinks } from './wiki-loader';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { loadClusters } from './semantic-clusters';
 
 export interface GraphNode {
   id: string;
   label: string;
   category: string;
+  clusterId?: number;
   x: number;
   y: number;
   semanticX: number | null;
@@ -68,6 +70,13 @@ export function buildGraph(articles: WikiArticle[]): GraphData {
   const linkCounts: Record<string, number> = {};
   const incomingCounts: Record<string, number> = {};
   const semanticLayout = loadSemanticLayout();
+  const clusterBySlug = new Map<string, number>();
+
+  for (const cluster of loadClusters().clusters) {
+    for (const slug of cluster.members) {
+      clusterBySlug.set(slug, cluster.id);
+    }
+  }
 
   // First pass: count links
   for (const article of articles) {
@@ -87,6 +96,7 @@ export function buildGraph(articles: WikiArticle[]): GraphData {
       id: article.slug,
       label: article.title,
       category: article.category,
+      clusterId: clusterBySlug.get(article.slug),
       x: Math.random() * 100,
       y: Math.random() * 100,
       semanticX: semantic?.x ?? null,

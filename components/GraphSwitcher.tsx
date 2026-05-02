@@ -22,6 +22,7 @@ const NestGraph = dynamic(() => import('@/components/NestGraph'), {
 interface GraphSwitcherProps {
   data: GraphData;
   focusSlug?: string;
+  clusterId?: number;
 }
 
 function GraphSkeleton() {
@@ -39,11 +40,18 @@ function GraphSkeleton() {
   );
 }
 
-export default function GraphSwitcher({ data, focusSlug }: GraphSwitcherProps) {
+export default function GraphSwitcher({ data, focusSlug, clusterId }: GraphSwitcherProps) {
   const searchParams = useSearchParams();
   const activeFocusSlug = focusSlug ?? searchParams.get('focus') ?? undefined;
+  const clusterParam = searchParams.get('cluster');
+  const rawClusterId = clusterId ?? (clusterParam === null ? Number.NaN : Number(clusterParam));
+  const activeClusterId = Number.isFinite(rawClusterId) ? rawClusterId : undefined;
   const [view, setView] = useState<'network' | 'topo' | 'semantic' | 'nest'>('network');
   const [bfcacheKey, setBfcacheKey] = useState(0);
+  const clusterNodeCount =
+    activeClusterId === undefined
+      ? 0
+      : data.nodes.filter((node) => node.clusterId === activeClusterId).length;
 
   useEffect(() => {
     const handlePageShow = (e: PageTransitionEvent) => {
@@ -71,13 +79,15 @@ export default function GraphSwitcher({ data, focusSlug }: GraphSwitcherProps) {
               : 'Nest Graph'}
           </h1>
           <p className="text-muted-foreground">
-            {view === 'network'
-              ? 'Interactive connections between articles.'
-              : view === 'topo'
-              ? 'Topographic view of knowledge density.'
-              : view === 'semantic'
-              ? 'Semantic landscape of your knowledge.'
-              : '3D organic cluster of your knowledge.'}
+            {activeClusterId !== undefined && clusterNodeCount > 0
+              ? `Cluster ${activeClusterId} focused with ${clusterNodeCount} articles highlighted.`
+              : view === 'network'
+                ? 'Interactive connections between articles.'
+                : view === 'topo'
+                  ? 'Topographic view of knowledge density.'
+                  : view === 'semantic'
+                    ? 'Semantic landscape of your knowledge.'
+                    : '3D organic cluster of your knowledge.'}
           </p>
         </div>
 
@@ -130,7 +140,12 @@ export default function GraphSwitcher({ data, focusSlug }: GraphSwitcherProps) {
       </div>
 
       {view === 'network' ? (
-        <GraphView key={bfcacheKey} data={data} focusSlug={activeFocusSlug} />
+        <GraphView
+          key={bfcacheKey}
+          data={data}
+          focusSlug={activeFocusSlug}
+          clusterId={activeClusterId}
+        />
       ) : view === 'topo' ? (
         <KnowledgeMap key={bfcacheKey} data={data} layoutMode="force" />
       ) : view === 'semantic' ? (

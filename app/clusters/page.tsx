@@ -2,7 +2,7 @@ import WikiLayout from '@/components/WikiLayout';
 import { loadClusters } from '@/lib/semantic-clusters';
 import { loadWikiIndex } from '@/lib/wiki-loader';
 import Link from 'next/link';
-import { Orbit, ArrowRight } from 'lucide-react';
+import { Orbit, ArrowRight, GitBranch } from 'lucide-react';
 import { formatCategory } from '@/lib/utils';
 
 export const metadata = {
@@ -19,7 +19,7 @@ export default async function ClustersPage() {
   const articleMap = new Map(wikiIndex.map((a) => [a.slug, a]));
 
   const enrichedClusters = clustersData.clusters.map((cluster) => {
-    const articles = cluster.members
+    const articles = Array.from(new Set(cluster.members))
       .map((slug) => articleMap.get(slug))
       .filter((a): a is NonNullable<typeof a> => !!a);
 
@@ -99,6 +99,17 @@ export default async function ClustersPage() {
                     +{cluster.totalCount - cluster.articles.length} more articles
                   </p>
                 )}
+
+                <div className="mt-4 border-t border-border/60 pt-3">
+                  <Link
+                    href={`/graph?cluster=${cluster.id}`}
+                    className="inline-flex items-center gap-1.5 rounded-md text-xs font-medium text-primary transition-colors hover:text-accent focus-ring"
+                  >
+                    <GitBranch className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    View in Graph
+                    <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

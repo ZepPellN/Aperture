@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Sigma } from 'sigma';
 import { UndirectedGraph } from 'graphology';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
@@ -11,6 +11,7 @@ import { formatCategory } from '@/lib/utils';
 interface GraphViewProps {
   data: GraphData;
   focusSlug?: string;
+  clusterId?: number;
 }
 
 // Theme-aware palettes
@@ -42,7 +43,7 @@ function useTheme() {
   return isDark;
 }
 
-export default function GraphView({ data, focusSlug }: GraphViewProps) {
+export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -52,28 +53,38 @@ export default function GraphView({ data, focusSlug }: GraphViewProps) {
   const selectedNode = data.nodes.find((n) => n.id === selected);
   const hoveredNode = data.nodes.find((n) => n.id === hovered);
   const activeNode = hoveredNode || selectedNode;
+  const clusterNodes = useMemo(
+    () => (clusterId === undefined ? [] : data.nodes.filter((node) => node.clusterId === clusterId)),
+    [clusterId, data.nodes]
+  );
 
   useEffect(() => {
     if (!containerRef.current || data.nodes.length === 0) return;
 
     const graph = new UndirectedGraph();
+    const hasClusterFocus = clusterId !== undefined && data.nodes.some((node) => node.clusterId === clusterId);
 
     for (const node of data.nodes) {
       const isFocused = focusSlug === node.id;
+      const isClusterMember = hasClusterFocus && node.clusterId === clusterId;
       graph.addNode(node.id, {
         label: node.label,
         x: node.x,
         y: node.y,
-        size: isFocused ? node.size * 1.5 : node.size,
-        color: isFocused ? '#b45309' : node.color,
+        size: isFocused ? node.size * 1.5 : isClusterMember ? node.size * 1.3 : node.size,
+        color: isFocused ? '#b45309' : isClusterMember || !hasClusterFocus ? node.color : '#d6d1ca',
       });
     }
 
     for (const edge of data.edges) {
       if (!graph.hasEdge(edge.source, edge.target)) {
+        const isClusterEdge =
+          hasClusterFocus &&
+          data.nodes.find((node) => node.id === edge.source)?.clusterId === clusterId &&
+          data.nodes.find((node) => node.id === edge.target)?.clusterId === clusterId;
         graph.addEdge(edge.source, edge.target, {
-          size: edge.size,
-          color: edge.color,
+          size: isClusterEdge ? edge.size * 1.8 : edge.size,
+          color: hasClusterFocus ? (isClusterEdge ? '#b45309' : '#eee7dd') : edge.color,
         });
       }
     }
@@ -116,13 +127,26 @@ export default function GraphView({ data, focusSlug }: GraphViewProps) {
           { duration: 600 }
         );
       });
+    } else if (hasClusterFocus && clusterId !== undefined && clusterNodes.length > 0) {
+      const xs = clusterNodes.map((node) => graph.getNodeAttribute(node.id, 'x') as number);
+      const ys = clusterNodes.map((node) => graph.getNodeAttribute(node.id, 'y') as number);
+      const center = {
+        x: xs.reduce((sum, value) => sum + value, 0) / xs.length,
+        y: ys.reduce((sum, value) => sum + value, 0) / ys.length,
+      };
+      requestAnimationFrame(() => {
+        sigma.getCamera().animate(
+          { x: center.x, y: center.y, ratio: Math.min(0.9, Math.max(0.35, xs.length / 90)) },
+          { duration: 600 }
+        );
+      });
     }
 
     return () => {
       sigma.kill();
       sigmaRef.current = null;
     };
-  }, [data, isDark, focusSlug]);
+  }, [data, isDark, focusSlug, clusterId, clusterNodes]);
 
   const theme = PALETTE[isDark ? 'dark' : 'light'];
 
@@ -146,6 +170,20 @@ export default function GraphView({ data, focusSlug }: GraphViewProps) {
             >
               Open article →
             </Link>
+          </div>
+        )}
+
+        {!activeNode && clusterId !== undefined && clusterNodes.length > 0 && (
+          <div className="absolute bottom-4 left-4 max-w-sm rounded-xl border border-border bg-card/95 p-4 shadow-sm backdrop-blur">
+            <div className="mb-1 inline-block rounded bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
+              Cluster {clusterId}
+            </div>
+            <div className="text-lg font-medium text-foreground">
+              {clusterNodes.length} highlighted articles
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Related semantic island from the clusters view.
+            </p>
           </div>
         )}
       </div>
