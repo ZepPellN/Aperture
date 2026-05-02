@@ -7,6 +7,7 @@
     "build": "npm run build:semantic && npm run tasks && npm run weekly-review && next build",
     "build:semantic": "tsx scripts/build-semantic.ts",
     "export:wiki": "tsx scripts/export-wiki.ts",
+    "graph:proposal": "tsx scripts/graph-proposal.ts",
     "insight": "tsx scripts/insight-report.ts",
     "tasks": "tsx scripts/task-extract.ts",
     "weekly-review": "tsx scripts/weekly-review.ts",
