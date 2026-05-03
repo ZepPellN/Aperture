@@ -18,13 +18,37 @@ export async function generateStaticParams() {
   }));
 }
 
+function sanitizeDescription(content: string): string {
+  return content
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // markdown links
+    .replace(/!?\[\[([^\]]*)\]\]/g, '$1') // wikilinks
+    .replace(/[#*_`>\-]/g, '') // markdown syntax chars
+    .replace(/\n+/g, ' ') // newlines to spaces
+    .trim()
+    .slice(0, 160);
+}
+
 export async function generateMetadata({ params }: WikiPageProps) {
   const { slug } = await params;
   const article = await loadArticle(slug.join('/'));
   if (!article) return { title: 'Not Found — Aperture' };
+  const description = sanitizeDescription(article.content);
   return {
-    title: `${article.title} — Aperture`,
-    description: article.content.slice(0, 160),
+    title: article.title,
+    description,
+    openGraph: {
+      type: 'article',
+      title: article.title,
+      description,
+      authors: ['ZepPellN'],
+      publishedTime: article.lastModified || undefined,
+      tags: article.category ? [article.category] : undefined,
+    },
+    twitter: {
+      card: 'summary',
+      title: article.title,
+      description,
+    },
   };
 }
 
@@ -63,14 +87,49 @@ export default async function WikiPage({ params }: WikiPageProps) {
     .filter((n): n is NonNullable<typeof n> => n !== null);
   const miniGraph = buildLocalGraph(allArticles, slugStr);
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://github.com/ZepPellN/Aperture';
+  const articleUrl = `${baseUrl}/wiki/${article.slug}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: sanitizeDescription(article.content),
+    url: articleUrl,
+    author: {
+      '@type': 'Person',
+      name: 'ZepPellN',
+      url: 'https://github.com/ZepPellN',
+    },
+    datePublished: article.lastModified || undefined,
+    dateModified: article.lastModified || undefined,
+    articleSection: article.category || undefined,
+    wordCount: article.wordCount,
+    inLanguage: 'zh-CN',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'Aperture',
+      url: baseUrl,
+    },
+    about: article.sources.map((s) => ({
+      '@type': 'Thing',
+      name: s.label,
+    })),
+  };
+
   return (
-    <WikiLayout>
-      <ArticleView
-        article={article}
-        backlinks={backlinks}
-        semanticTrail={semanticTrail}
-        miniGraph={miniGraph}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-    </WikiLayout>
+      <WikiLayout>
+        <ArticleView
+          article={article}
+          backlinks={backlinks}
+          semanticTrail={semanticTrail}
+          miniGraph={miniGraph}
+        />
+      </WikiLayout>
+    </>
   );
 }

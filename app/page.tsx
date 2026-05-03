@@ -37,14 +37,45 @@ export default async function HomePage() {
       .filter((n): n is NonNullable<typeof n> => n !== null);
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://github.com/ZepPellN/Aperture';
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Aperture',
+    url: baseUrl,
+    description: 'A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.',
+    author: {
+      '@type': 'Person',
+      name: 'ZepPellN',
+      url: 'https://github.com/ZepPellN',
+    },
+    publisher: {
+      '@type': 'Person',
+      name: 'ZepPellN',
+      url: 'https://github.com/ZepPellN',
+    },
+    inLanguage: 'zh-CN',
+    about: Object.keys(byCategory).map((cat) => ({
+      '@type': 'Thing',
+      name: cat,
+    })),
+  };
+
   return (
-    <WikiLayout>
-      <HomeContent
-        index={index}
-        stats={stats}
-        byCategory={byCategory}
-        neighborsMap={neighborsMap}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-    </WikiLayout>
+      <WikiLayout>
+        <HomeContent
+          index={index}
+          stats={stats}
+          byCategory={byCategory}
+          neighborsMap={neighborsMap}
+        />
+      </WikiLayout>
+    </>
   );
 }

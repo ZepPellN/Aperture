@@ -19,9 +19,42 @@ const newsreader = Newsreader({
   style: ["normal", "italic"],
 });
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://github.com/ZepPellN/Aperture';
+
 export const metadata: Metadata = {
-  title: "Aperture — Browse your LLM-compiled wiki",
-  description: "A web reader for LLM-compiled personal wikis.",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Aperture — Browse your LLM-compiled wiki",
+    template: "%s — Aperture",
+  },
+  description: "A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.",
+  authors: [{ name: "ZepPellN", url: "https://github.com/ZepPellN" }],
+  keywords: ["wiki", "llm", "knowledge base", "markdown", "personal wiki", "agent-native"],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Aperture",
+    title: "Aperture — Browse your LLM-compiled wiki",
+    description: "A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.",
+    images: ["/docs/screenshots/wiki-article.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aperture — Browse your LLM-compiled wiki",
+    description: "A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph.",
+    images: ["/docs/screenshots/wiki-article.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
