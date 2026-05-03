@@ -1,6 +1,6 @@
 # Aperture — LLM Wiki Framework
 
-Aperture is a markdown-first LLM Wiki framework: it turns raw documents into an interlinked wiki, renders that wiki as a browsable graph-aware website, and exposes the same knowledge in agent-readable formats.
+Aperture is a markdown-first personal knowledge and life system: it turns raw documents into an interlinked LLM Wiki, renders that wiki as a graph-aware website, and also provides a Life Dashboard for journals, goals, tasks, habits, weekly intent, and reviews.
 
 It is designed for agent workflows. Humans should not need to memorize the setup sequence; hand the repo to an agent and let it initialize the vault, install skills, ingest sources, and open the viewer.
 
@@ -11,7 +11,7 @@ It is designed for agent workflows. Humans should not need to memorize the setup
 Give your agent this instruction:
 
 ```text
-Set up this Aperture repo for my knowledge base. Read AGENT_SETUP.md and BASIC_SCHEMA.md, create or connect a vault with raw/ and wiki/, install the .agents/skills/wiki-* skills plus _wiki-common.md, configure WIKI_ROOT in .env.local, run the initial wiki ingest, start the Aperture viewer, and verify the main UI routes plus maintenance commands.
+Set up this Aperture repo for my knowledge base and life dashboard. Read AGENT_SETUP.md and BASIC_SCHEMA.md, create or connect a vault with raw/, wiki/, witness/, tasks/, and reviews/, install the .agents/skills/wiki-* skills plus _wiki-common.md, configure WIKI_ROOT in .env.local, run the initial wiki ingest, generate tasks and weekly reviews, start the Aperture viewer, and verify the main UI routes plus maintenance commands.
 ```
 
 For a quick local run after setup:
@@ -81,11 +81,21 @@ The repo ships wiki skills under `.agents/skills/`:
 - `/wiki-rebuild-index` — rebuild index and backlinks.
 - `/wiki-reorganize` — rethink structure and merges/splits.
 
-### 8. Maintenance Commands
+### 8. Life Dashboard
+
+- `/life` renders a personal operating dashboard from the same vault.
+- Reads daily journals from `witness/daily`.
+- Reads life areas and goals from `witness/life-areas.md` and `witness/2026-goals.md`.
+- Shows weekly intent, pending/done tasks, recent days, mood, habits, ideas, goals, and weekly reviews.
+- Preserves the same file-first philosophy: life data stays as markdown in the vault.
+
+### 9. Maintenance Commands
 
 These produce reviewable artifacts in `exports/`:
 
 ```bash
+npm run tasks
+npm run weekly-review
 npm run graph:proposal -- --focus <slug>
 npm run graph:proposal -- --cluster <id>
 npm run export:wiki
@@ -93,7 +103,7 @@ npm run wiki:health
 npm run wiki:entities
 ```
 
-They cover graph research proposals, wiki snapshot export, health reports, entity detection, aliases, confidence, and suggested wikilinks.
+They cover life task extraction, weekly life reviews, graph research proposals, wiki snapshot export, health reports, entity detection, aliases, confidence, and suggested wikilinks.
 
 ---
 
@@ -102,6 +112,7 @@ They cover graph research proposals, wiki snapshot export, health reports, entit
 | Route | Purpose |
 |-------|---------|
 | `/` | Search, recently updated pages, and category overview |
+| `/life` | Life Dashboard for journals, tasks, habits, goals, weekly intent, and reviews |
 | `/wiki/<slug>` | Article view with sources, evolution, backlinks, semantic trail, and local graph |
 | `/graph` | Full graph explorer |
 | `/graph?focus=<slug>` | Focused article graph |
@@ -124,7 +135,7 @@ They cover graph research proposals, wiki snapshot export, health reports, entit
 | `app/` | Next.js app routes |
 | `components/` | UI components |
 | `lib/` | Wiki, graph, semantic, and metadata loaders |
-| `scripts/` | Export, report, and proposal commands |
+| `scripts/` | Life tasks/reviews, export, report, and proposal commands |
 
 ---
 
