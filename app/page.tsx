@@ -46,14 +46,14 @@ export default async function HomePage() {
     url: baseUrl,
     description: 'A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.',
     author: {
-      '@type': 'Person',
-      name: 'ZepPellN',
-      url: 'https://github.com/ZepPellN',
+      '@type': 'Organization',
+      name: 'Aperture',
+      url: 'https://github.com/ZepPellN/Aperture',
     },
     publisher: {
-      '@type': 'Person',
-      name: 'ZepPellN',
-      url: 'https://github.com/ZepPellN',
+      '@type': 'Organization',
+      name: 'Aperture',
+      url: 'https://github.com/ZepPellN/Aperture',
     },
     inLanguage: 'zh-CN',
     about: Object.keys(byCategory).map((cat) => ({

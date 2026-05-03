@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s — Aperture",
   },
   description: "A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.",
-  authors: [{ name: "ZepPellN", url: "https://github.com/ZepPellN" }],
+  authors: [{ name: "Aperture", url: "https://github.com/ZepPellN/Aperture" }],
   keywords: ["wiki", "llm", "knowledge base", "markdown", "personal wiki", "agent-native"],
   openGraph: {
     type: "website",
