@@ -1,0 +1,52 @@
+# Aperture 完整文章索引
+
+本文档是 Aperture Wiki 的完整机器可读索引，包含每篇文章的页面地址、JSON API 地址、摘要、来源及图谱元数据。
+
+如需获取单篇文章的完整 Markdown 与 HTML，请使用 `/api/wiki/<slug>`。
+
+- 总文章数: 3
+- 开源仓库: https://github.com/ZepPellN/Aperture
+
+## 文章列表
+
+### Agentic Coding
+
+- Slug: concepts/agentic-coding
+- 分类: concepts
+- 页面: /wiki/concepts/agentic-coding
+- JSON: /api/wiki/concepts/agentic-coding
+- 更新日期: 2026-04-15
+- 字数: 266
+- 来源数: 1
+- 演化事件: 1
+- 摘要: Agentic Coding Agentic coding is the practice of using AI agents to write, review, and maintain software with minimal human intervention. The human defines the goal; the agent determines the implementation, tests its own code, and iterates...
+- 来源列表:
+  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+
+### Claude Code
+
+- Slug: entities/claude-code
+- 分类: entities
+- 页面: /wiki/entities/claude-code
+- JSON: /api/wiki/entities/claude-code
+- 更新日期: 2026-04-15
+- 字数: 142
+- 来源数: 1
+- 演化事件: 1
+- 摘要: Claude Code Claude Code is Anthropic's agentic coding tool. It is a specific implementation of agentic coding principles, built on top of Claude (Sonnet/Opus models). Architecture Claude Code uses two core primitives: - Bash tool — execute...
+- 来源列表:
+  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+
+### AI Coding Forecasts 2026
+
+- Slug: forecasts/ai-coding-2026
+- 分类: forecasts
+- 页面: /wiki/forecasts/ai-coding-2026
+- JSON: /api/wiki/forecasts/ai-coding-2026
+- 更新日期: 2026-04-15
+- 字数: 90
+- 来源数: 1
+- 演化事件: 1
+- 摘要: AI Coding Forecasts 2026 This page tracks predictions about the agentic coding landscape in 2026. Current Trajectory Agentic coding tools are moving from experimental to production. Key signals: - Enterprise adoption of Claude Code and Curs...
+- 来源列表:
+  - The Rise of Agentic Coding (raw/to-learn/example-article.md)

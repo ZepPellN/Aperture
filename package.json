@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run build:semantic && npm run tasks && npm run weekly-review && next build",
+    "build": "npm run build:semantic && npm run tasks && npm run weekly-review && npm run generate:llms-txt && next build",
+    "generate:llms-txt": "tsx scripts/generate-llms-txt.ts",
     "build:semantic": "tsx scripts/build-semantic.ts",
     "export:wiki": "tsx scripts/export-wiki.ts",
     "graph:proposal": "tsx scripts/graph-proposal.ts",

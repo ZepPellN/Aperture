@@ -1,0 +1,52 @@
+# Aperture Full Article Index
+
+This file is a compact, agent-readable index of every wiki article, including stable page URLs, JSON API URLs, summaries, sources, and graph metadata counts.
+
+Use `/api/wiki/<slug>` for full markdown and HTML of any individual article.
+
+- Total articles: 3
+- Repository: https://github.com/ZepPellN/Aperture
+
+## Articles
+
+### Agentic Coding
+
+- Slug: concepts/agentic-coding
+- Category: concepts
+- Page: /wiki/concepts/agentic-coding
+- JSON: /api/wiki/concepts/agentic-coding
+- Updated: 2026-04-15
+- Words: 266
+- Sources: 1
+- Evolution events: 1
+- Summary: Agentic Coding Agentic coding is the practice of using AI agents to write, review, and maintain software with minimal human intervention. The human defines the goal; the agent determines the implementation, tests its own code, and iterates...
+- Source list:
+  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+
+### Claude Code
+
+- Slug: entities/claude-code
+- Category: entities
+- Page: /wiki/entities/claude-code
+- JSON: /api/wiki/entities/claude-code
+- Updated: 2026-04-15
+- Words: 142
+- Sources: 1
+- Evolution events: 1
+- Summary: Claude Code Claude Code is Anthropic's agentic coding tool. It is a specific implementation of agentic coding principles, built on top of Claude (Sonnet/Opus models). Architecture Claude Code uses two core primitives: - Bash tool — execute...
+- Source list:
+  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+
+### AI Coding Forecasts 2026
+
+- Slug: forecasts/ai-coding-2026
+- Category: forecasts
+- Page: /wiki/forecasts/ai-coding-2026
+- JSON: /api/wiki/forecasts/ai-coding-2026
+- Updated: 2026-04-15
+- Words: 90
+- Sources: 1
+- Evolution events: 1
+- Summary: AI Coding Forecasts 2026 This page tracks predictions about the agentic coding landscape in 2026. Current Trajectory Agentic coding tools are moving from experimental to production. Key signals: - Enterprise adoption of Claude Code and Curs...
+- Source list:
+  - The Rise of Agentic Coding (raw/to-learn/example-article.md)

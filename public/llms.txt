@@ -1,0 +1,26 @@
+# Aperture
+
+Aperture is a markdown-first wiki and life system for agent-native work.
+It turns raw notes, links, transcripts, and daily logs into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.
+
+- Repository: https://github.com/ZepPellN/Aperture
+- README: https://github.com/ZepPellN/Aperture#readme
+
+## Core Routes
+
+- `/wiki/<slug>`: human-readable article page with sources, semantic trail, and local graph.
+- `/graph?focus=<slug>`: focused knowledge graph for an article.
+- `/clusters`: browse knowledge by semantic clusters.
+- `/life`: life dashboard (tasks, habits, mood, weekly reviews).
+- `/api/wiki/<slug>`: full JSON for an article (for AI consumption).
+- `/llms-full.txt`: complete article index.
+
+## Agent Onboarding
+
+Tell your agent to read `AGENT_SETUP.md` for full setup: scaffolding, skill installation, content ingestion, and viewer launch.
+
+## Article Index
+
+- [Agentic Coding](/wiki/concepts/agentic-coding) — /api/wiki/concepts/agentic-coding
+- [Claude Code](/wiki/entities/claude-code) — /api/wiki/entities/claude-code
+- [AI Coding Forecasts 2026](/wiki/forecasts/ai-coding-2026) — /api/wiki/forecasts/ai-coding-2026
