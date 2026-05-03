@@ -48,6 +48,12 @@ export default function GraphSwitcher({ data, focusSlug, clusterId }: GraphSwitc
   const activeClusterId = Number.isFinite(rawClusterId) ? rawClusterId : undefined;
   const [view, setView] = useState<'network' | 'topo' | 'semantic' | 'nest'>('network');
   const [bfcacheKey, setBfcacheKey] = useState(0);
+  const focusNode = activeFocusSlug
+    ? data.nodes.find((node) => node.id === activeFocusSlug)
+    : undefined;
+  const focusNeighborCount = activeFocusSlug
+    ? data.edges.filter((edge) => edge.source === activeFocusSlug || edge.target === activeFocusSlug).length
+    : 0;
   const clusterNodeCount =
     activeClusterId === undefined
       ? 0
@@ -79,7 +85,9 @@ export default function GraphSwitcher({ data, focusSlug, clusterId }: GraphSwitc
               : 'Nest Graph'}
           </h1>
           <p className="text-muted-foreground">
-            {activeClusterId !== undefined && clusterNodeCount > 0
+            {focusNode
+              ? `Focused on ${focusNode.label} with ${focusNeighborCount} direct connection${focusNeighborCount === 1 ? '' : 's'}.`
+              : activeClusterId !== undefined && clusterNodeCount > 0
               ? `Cluster ${activeClusterId} focused with ${clusterNodeCount} articles highlighted.`
               : view === 'network'
                 ? 'Interactive connections between articles.'

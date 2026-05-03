@@ -408,6 +408,36 @@ function loadEvolution(slug: string): WikiEvolutionEvent[] {
   }
 }
 
+function derivedEvolution(
+  slug: string,
+  title: string,
+  frontmatter: Record<string, unknown>,
+  sources: WikiSource[]
+): WikiEvolutionEvent[] {
+  const date = toDateString(frontmatter.created || frontmatter.date || frontmatter.updated);
+  if (!date && sources.length === 0) return [];
+
+  const sourceRefs = sources.slice(0, 5).map((source) => ({
+    slug: source.path,
+    title: source.label,
+  }));
+
+  return [
+    {
+      date: date || new Date().toISOString().slice(0, 10),
+      type: sources.length > 0 ? 'absorbed' : 'created',
+      title: sources.length > 0 ? 'Derived from source material' : 'Created as a wiki page',
+      summary:
+        sources.length > 0
+          ? `This page is currently synthesized from ${sources.length} source${sources.length === 1 ? '' : 's'}.`
+          : 'This page has no explicit evolution metadata yet, so Aperture is showing a baseline creation event.',
+      from: sourceRefs.length > 0 ? sourceRefs : undefined,
+      to: [{ slug, title }],
+      sources: sources.map((source) => source.path),
+    },
+  ];
+}
+
 function parseEvolutionType(value: unknown): WikiEvolutionEvent['type'] {
   if (
     value === 'created' ||
@@ -508,7 +538,6 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
     ...sourcesFromFrontmatter(parsed.data.sources),
     ...sourcesFromContributions(sourceContributions),
   ]), sourceContributions);
-  const evolution = loadEvolution(slug);
   const displayContent = stripSourcesSection(content);
   const html = await compileMarkdown(displayContent);
   const words = displayContent.split(/\s+/).filter(Boolean).length;
@@ -516,6 +545,11 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
   const title = typeof parsed.data.title === 'string'
     ? parsed.data.title
     : basename(slug).replace(/-/g, ' ');
+  const explicitEvolution = loadEvolution(slug);
+  const evolution =
+    explicitEvolution.length > 0
+      ? explicitEvolution
+      : derivedEvolution(slug, title, parsed.data, sources);
 
   return {
     slug,
@@ -528,7 +562,7 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
     evolution,
     readingTime: estimateReadingTime(words),
     wordCount: words,
-    lastModified: toDateString(parsed.data.updated || parsed.data.date),
+    lastModified: toDateString(parsed.data.updated || parsed.data.date || parsed.data.created),
   };
 }
 

@@ -49,6 +49,43 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
   const [selected, setSelected] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const isDark = useTheme();
+  const focusedNode = focusSlug ? data.nodes.find((node) => node.id === focusSlug) : undefined;
+  const visibleData = useMemo(() => {
+    if (!focusSlug || !focusedNode) return data;
+
+    const incidentEdges = data.edges.filter(
+      (edge) => edge.source === focusSlug || edge.target === focusSlug
+    );
+    const neighborIds = Array.from(
+      new Set(
+        incidentEdges.map((edge) => (edge.source === focusSlug ? edge.target : edge.source))
+      )
+    ).slice(0, 18);
+    const visibleIds = new Set([focusSlug, ...neighborIds]);
+    const visibleEdges = data.edges.filter(
+      (edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target)
+    );
+    const visibleNodes = data.nodes
+      .filter((node) => visibleIds.has(node.id))
+      .map((node) => {
+        if (node.id === focusSlug) {
+          return { ...node, x: 0, y: 0, size: Math.max(node.size, 11) };
+        }
+
+        const index = Math.max(0, neighborIds.indexOf(node.id));
+        const angle = (Math.PI * 2 * index) / Math.max(1, neighborIds.length);
+        const radius = neighborIds.length > 8 ? 18 : 14;
+        return {
+          ...node,
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius,
+          size: Math.max(5, Math.min(node.size, 8)),
+        };
+      });
+
+    return { nodes: visibleNodes, edges: visibleEdges };
+  }, [data, focusSlug, focusedNode]);
+  const focusNeighborCount = focusSlug ? Math.max(0, visibleData.nodes.length - 1) : 0;
 
   const selectedNode = data.nodes.find((n) => n.id === selected);
   const hoveredNode = data.nodes.find((n) => n.id === hovered);
@@ -59,12 +96,13 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
   );
 
   useEffect(() => {
-    if (!containerRef.current || data.nodes.length === 0) return;
+    if (!containerRef.current || visibleData.nodes.length === 0) return;
 
     const graph = new UndirectedGraph();
-    const hasClusterFocus = clusterId !== undefined && data.nodes.some((node) => node.clusterId === clusterId);
+    const hasFocusGraph = Boolean(focusSlug && focusedNode);
+    const hasClusterFocus = clusterId !== undefined && visibleData.nodes.some((node) => node.clusterId === clusterId);
 
-    for (const node of data.nodes) {
+    for (const node of visibleData.nodes) {
       const isFocused = focusSlug === node.id;
       const isClusterMember = hasClusterFocus && node.clusterId === clusterId;
       graph.addNode(node.id, {
@@ -76,21 +114,23 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
       });
     }
 
-    for (const edge of data.edges) {
+    for (const edge of visibleData.edges) {
       if (!graph.hasEdge(edge.source, edge.target)) {
         const isClusterEdge =
           hasClusterFocus &&
-          data.nodes.find((node) => node.id === edge.source)?.clusterId === clusterId &&
-          data.nodes.find((node) => node.id === edge.target)?.clusterId === clusterId;
+          visibleData.nodes.find((node) => node.id === edge.source)?.clusterId === clusterId &&
+          visibleData.nodes.find((node) => node.id === edge.target)?.clusterId === clusterId;
         graph.addEdge(edge.source, edge.target, {
-          size: isClusterEdge ? edge.size * 1.8 : edge.size,
-          color: hasClusterFocus ? (isClusterEdge ? '#b45309' : '#eee7dd') : edge.color,
+          size: hasFocusGraph ? edge.size * 1.5 : isClusterEdge ? edge.size * 1.8 : edge.size,
+          color: hasFocusGraph ? '#c7b7a3' : hasClusterFocus ? (isClusterEdge ? '#b45309' : '#eee7dd') : edge.color,
         });
       }
     }
 
-    const settings = forceAtlas2.inferSettings(graph);
-    forceAtlas2.assign(graph, { settings, iterations: 120 });
+    if (!hasFocusGraph) {
+      const settings = forceAtlas2.inferSettings(graph);
+      forceAtlas2.assign(graph, { settings, iterations: 120 });
+    }
 
     const theme = PALETTE[isDark ? 'dark' : 'light'];
     const sigma = new Sigma(graph, containerRef.current, {
@@ -119,12 +159,11 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
     sigmaRef.current = sigma;
 
     if (focusSlug && graph.hasNode(focusSlug)) {
-      const focusedNode = graph.getNodeAttributes(focusSlug) as { x: number; y: number };
       requestAnimationFrame(() => {
         setSelected(focusSlug);
         sigma.getCamera().animate(
-          { x: focusedNode.x, y: focusedNode.y, ratio: 0.35 },
-          { duration: 600 }
+          { x: 0, y: 0, ratio: hasFocusGraph ? 1.05 : 0.5 },
+          { duration: 300 }
         );
       });
     } else if (hasClusterFocus && clusterId !== undefined && clusterNodes.length > 0) {
@@ -146,7 +185,7 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
       sigma.kill();
       sigmaRef.current = null;
     };
-  }, [data, isDark, focusSlug, clusterId, clusterNodes]);
+  }, [visibleData, data, isDark, focusSlug, focusedNode, clusterId, clusterNodes]);
 
   const theme = PALETTE[isDark ? 'dark' : 'light'];
 
@@ -156,7 +195,7 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
         <div ref={containerRef} className="h-[65vh] w-full" />
 
         {activeNode && (
-          <div className="absolute bottom-4 left-4 max-w-sm rounded-xl border border-border bg-card/95 p-4 shadow-sm backdrop-blur">
+          <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-border bg-card/95 p-4 shadow-sm backdrop-blur sm:right-auto sm:max-w-sm">
             <div
               className="mb-1 inline-block rounded px-2 py-0.5 text-xs font-medium text-white"
               style={{ backgroundColor: activeNode.color }}
@@ -170,6 +209,18 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
             >
               Open article →
             </Link>
+          </div>
+        )}
+
+        {focusSlug && focusedNode && (
+          <div className="absolute left-4 right-4 top-4 rounded-xl border border-border bg-card/95 px-3 py-2 text-sm shadow-sm backdrop-blur sm:right-auto sm:max-w-sm">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Focus mode
+            </div>
+            <div className="truncate font-medium text-foreground">{focusedNode.label}</div>
+            <div className="text-xs text-muted-foreground">
+              {focusNeighborCount} direct neighbor{focusNeighborCount === 1 ? '' : 's'} shown
+            </div>
           </div>
         )}
 
@@ -189,8 +240,8 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3 text-sm">
-        {Array.from(new Set(data.nodes.map((n) => n.category))).map((cat) => {
-          const color = data.nodes.find((n) => n.category === cat)?.color || PALETTE[isDark ? 'dark' : 'light'].node;
+        {Array.from(new Set(visibleData.nodes.map((n) => n.category))).map((cat) => {
+          const color = visibleData.nodes.find((n) => n.category === cat)?.color || PALETTE[isDark ? 'dark' : 'light'].node;
           return (
             <div key={cat} className="flex items-center gap-1.5">
               <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
