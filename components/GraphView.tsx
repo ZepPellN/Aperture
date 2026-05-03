@@ -30,6 +30,17 @@ const PALETTE = {
   },
 };
 
+type GraphTheme = (typeof PALETTE)['light'];
+
+function hasUsableWebGL() {
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch {
+    return false;
+  }
+}
+
 function useTheme() {
   const [isDark, setIsDark] = useState(false);
   useEffect(() => {
@@ -43,11 +54,142 @@ function useTheme() {
   return isDark;
 }
 
+function truncateLabel(label: string) {
+  return label.length > 30 ? `${label.slice(0, 29)}...` : label;
+}
+
+function StaticGraphView({
+  data,
+  focusSlug,
+  clusterId,
+  theme,
+  selected,
+  hovered,
+  onSelect,
+  onHover,
+}: {
+  data: GraphData;
+  focusSlug?: string;
+  clusterId?: number;
+  theme: GraphTheme;
+  selected: string | null;
+  hovered: string | null;
+  onSelect: (slug: string | null) => void;
+  onHover: (slug: string | null) => void;
+}) {
+  const positions = useMemo(() => {
+    const xs = data.nodes.map((node) => node.x);
+    const ys = data.nodes.map((node) => node.y);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const xSpan = maxX - minX || 1;
+    const ySpan = maxY - minY || 1;
+
+    return new Map(
+      data.nodes.map((node) => [
+        node.id,
+        {
+          x: 12 + ((node.x - minX) / xSpan) * 76,
+          y: 12 + ((node.y - minY) / ySpan) * 76,
+        },
+      ])
+    );
+  }, [data.nodes]);
+
+  const focusedNode = focusSlug ? data.nodes.find((node) => node.id === focusSlug) : undefined;
+  const activeSlug = hovered || selected || focusSlug || null;
+  const shouldShowLabel = data.nodes.length <= 24;
+
+  return (
+    <svg
+      className="h-[65vh] w-full"
+      role="img"
+      aria-label="Static network graph fallback"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <rect width="100" height="100" fill={theme.bg} />
+      {data.edges.map((edge) => {
+        const source = positions.get(edge.source);
+        const target = positions.get(edge.target);
+        if (!source || !target) return null;
+        const isActive = edge.source === activeSlug || edge.target === activeSlug;
+        return (
+          <line
+            key={`${edge.source}-${edge.target}`}
+            x1={source.x}
+            y1={source.y}
+            x2={target.x}
+            y2={target.y}
+            stroke={isActive ? '#b45309' : theme.edge}
+            strokeWidth={Math.max(0.25, Math.min(1.2, edge.size * 0.22))}
+            opacity={isActive ? 0.9 : 0.58}
+          />
+        );
+      })}
+      {data.nodes.map((node) => {
+        const point = positions.get(node.id);
+        if (!point) return null;
+        const isFocused = node.id === focusSlug;
+        const isClusterMember = clusterId !== undefined && node.clusterId === clusterId;
+        const isActive = node.id === activeSlug;
+        const radius = Math.max(1.1, Math.min(3.2, node.size * (isFocused ? 0.42 : 0.32)));
+        return (
+          <g
+            key={node.id}
+            className="cursor-pointer"
+            onClick={() => onSelect(node.id)}
+            onMouseEnter={() => onHover(node.id)}
+            onMouseLeave={() => onHover(null)}
+          >
+            {(isFocused || isActive) && (
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={radius + 1.8}
+                fill="none"
+                stroke="#b45309"
+                strokeWidth={0.5}
+              />
+            )}
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r={radius}
+              fill={isFocused ? '#b45309' : node.color}
+              opacity={clusterId !== undefined && !isClusterMember && !isFocused ? 0.35 : 0.95}
+            />
+            {(shouldShowLabel || isActive || isFocused) && (
+              <text
+                x={point.x + radius + 1.2}
+                y={point.y + 0.8}
+                fill={theme.label}
+                fontSize="2.2"
+                fontWeight={isFocused || isActive ? 600 : 500}
+              >
+                {truncateLabel(node.label)}
+              </text>
+            )}
+          </g>
+        );
+      })}
+      {focusedNode && (
+        <text x="4" y="96" fill={theme.label} fontSize="2.4" fontWeight="600">
+          Focus: {truncateLabel(focusedNode.label)}
+        </text>
+      )}
+    </svg>
+  );
+}
+
 export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [useStaticGraph, setUseStaticGraph] = useState(false);
   const isDark = useTheme();
   const focusedNode = focusSlug ? data.nodes.find((node) => node.id === focusSlug) : undefined;
   const visibleData = useMemo(() => {
@@ -96,7 +238,12 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
   );
 
   useEffect(() => {
+    if (useStaticGraph) return;
     if (!containerRef.current || visibleData.nodes.length === 0) return;
+    if (!hasUsableWebGL()) {
+      requestAnimationFrame(() => setUseStaticGraph(true));
+      return;
+    }
 
     const graph = new UndirectedGraph();
     const hasFocusGraph = Boolean(focusSlug && focusedNode);
@@ -133,16 +280,23 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
     }
 
     const theme = PALETTE[isDark ? 'dark' : 'light'];
-    const sigma = new Sigma(graph, containerRef.current, {
-      renderLabels: true,
-      labelSize: 12,
-      labelWeight: '500',
-      labelColor: { color: theme.label },
-      defaultNodeColor: theme.node,
-      defaultEdgeColor: theme.edge,
-      minCameraRatio: 0.05,
-      maxCameraRatio: 2,
-    });
+    let sigma: Sigma;
+    try {
+      sigma = new Sigma(graph, containerRef.current, {
+        renderLabels: true,
+        labelSize: 12,
+        labelWeight: '500',
+        labelColor: { color: theme.label },
+        defaultNodeColor: theme.node,
+        defaultEdgeColor: theme.edge,
+        minCameraRatio: 0.05,
+        maxCameraRatio: 2,
+      });
+    } catch (error) {
+      console.warn('Falling back to static graph rendering.', error);
+      requestAnimationFrame(() => setUseStaticGraph(true));
+      return;
+    }
 
     sigma.on('clickNode', (e) => {
       setSelected(e.node);
@@ -185,14 +339,27 @@ export default function GraphView({ data, focusSlug, clusterId }: GraphViewProps
       sigma.kill();
       sigmaRef.current = null;
     };
-  }, [visibleData, data, isDark, focusSlug, focusedNode, clusterId, clusterNodes]);
+  }, [visibleData, data, isDark, focusSlug, focusedNode, clusterId, clusterNodes, useStaticGraph]);
 
   const theme = PALETTE[isDark ? 'dark' : 'light'];
 
   return (
     <div className="mx-auto max-w-7xl">
       <div className="relative overflow-hidden rounded-2xl border border-border" style={{ background: theme.bg }}>
-        <div ref={containerRef} className="h-[65vh] w-full" />
+        {useStaticGraph ? (
+          <StaticGraphView
+            data={visibleData}
+            focusSlug={focusSlug}
+            clusterId={clusterId}
+            theme={theme}
+            selected={selected}
+            hovered={hovered}
+            onSelect={setSelected}
+            onHover={setHovered}
+          />
+        ) : (
+          <div ref={containerRef} className="h-[65vh] w-full" />
+        )}
 
         {activeNode && (
           <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-border bg-card/95 p-4 shadow-sm backdrop-blur sm:right-auto sm:max-w-sm">
