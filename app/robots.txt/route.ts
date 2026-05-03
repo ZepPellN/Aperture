@@ -54,7 +54,9 @@ Allow: /
 # llms.txt standard — point AI agents to machine-readable index
 User-agent: *
 Allow: /llms.txt
+Allow: /llms-zh.txt
 Allow: /llms-full.txt
+Allow: /llms-full-zh.txt
 Allow: /api/wiki/
 
 # Sitemap
