@@ -349,8 +349,8 @@ _Tags: #weekly #review #auto-generated_
 
 function main() {
   if (!existsSync(DAILY_DIR)) {
-    console.error(`[weekly] Daily directory not found: ${DAILY_DIR}`);
-    process.exit(1);
+    console.warn(`[weekly] Daily directory not found: ${DAILY_DIR}, skipping.`);
+    return;
   }
 
   const files = readdirSync(DAILY_DIR)

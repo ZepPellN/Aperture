@@ -197,8 +197,8 @@ function mergeWithExisting(newTasks: TaskItem[], existingFilePath: string): Task
 
 function main() {
   if (!existsSync(DAILY_DIR)) {
-    console.error(`[tasks] Daily directory not found: ${DAILY_DIR}`);
-    process.exit(1);
+    console.warn(`[tasks] Daily directory not found: ${DAILY_DIR}, skipping.`);
+    return;
   }
 
   const files = readdirSync(DAILY_DIR)
