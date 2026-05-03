@@ -9,15 +9,16 @@ function sourceLine(label: string, path: string): string {
 export async function GET() {
   const articles = await loadAllArticles();
   const lines = [
-    '# Aperture Wiki Full Index',
+    '# Aperture 完整文章索引',
     '',
-    'This file is a compact, agent-readable index of every wiki article, including stable page URLs, JSON URLs, summaries, sources, and graph metadata counts.',
+    '本文档是 Aperture Wiki 的完整机器可读索引，包含每篇文章的页面地址、JSON API 地址、摘要、来源及图谱元数据。',
     '',
-    'Use `/api/wiki/<slug>` for full markdown and HTML for any individual article.',
+    '如需获取单篇文章的完整 Markdown 与 HTML，请使用 `/api/wiki/<slug>`。',
     '',
-    `Total articles: ${articles.length}`,
+    `- 总文章数: ${articles.length}`,
+    `- 开源仓库: https://github.com/ZepPellN/Aperture`,
     '',
-    '## Articles',
+    '## 文章列表',
     '',
     ...articles
       .sort((a, b) => a.slug.localeCompare(b.slug))
@@ -25,17 +26,17 @@ export async function GET() {
         `### ${article.title}`,
         '',
         `- Slug: ${article.slug}`,
-        `- Category: ${article.category}`,
-        `- Page: /wiki/${article.slug}`,
+        `- 分类: ${article.category}`,
+        `- 页面: /wiki/${article.slug}`,
         `- JSON: /api/wiki/${article.slug}`,
-        `- Updated: ${article.lastModified || 'unknown'}`,
-        `- Words: ${article.wordCount}`,
-        `- Sources: ${article.sources.length}`,
-        `- Evolution events: ${article.evolution.length}`,
-        `- Summary: ${extractSummary(article.content, 240) || 'No summary available.'}`,
+        `- 更新日期: ${article.lastModified || '未知'}`,
+        `- 字数: ${article.wordCount}`,
+        `- 来源数: ${article.sources.length}`,
+        `- 演化事件: ${article.evolution.length}`,
+        `- 摘要: ${extractSummary(article.content, 240) || '暂无摘要'}`,
         ...(article.sources.length > 0
           ? [
-              '- Source list:',
+              '- 来源列表:',
               ...article.sources
                 .slice(0, 5)
                 .map((source) => `  - ${sourceLine(source.label, source.path)}`),

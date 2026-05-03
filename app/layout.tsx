@@ -32,17 +32,17 @@ export const metadata: Metadata = {
   keywords: ["wiki", "llm", "knowledge base", "markdown", "personal wiki", "agent-native"],
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "zh_CN",
     siteName: "Aperture",
     title: "Aperture — Browse your LLM-compiled wiki",
     description: "A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.",
-    images: ["/docs/screenshots/wiki-article.png"],
+    images: ["https://raw.githubusercontent.com/ZepPellN/Aperture/main/docs/screenshots/wiki-article.png"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Aperture — Browse your LLM-compiled wiki",
     description: "A web reader for LLM-compiled personal wikis. Turn raw notes into a browsable knowledge graph.",
-    images: ["/docs/screenshots/wiki-article.png"],
+    images: ["https://raw.githubusercontent.com/ZepPellN/Aperture/main/docs/screenshots/wiki-article.png"],
   },
   robots: {
     index: true,
@@ -64,7 +64,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} antialiased`}
       suppressHydrationWarning
     >
