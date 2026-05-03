@@ -10,6 +10,7 @@
     "graph:proposal": "tsx scripts/graph-proposal.ts",
     "insight": "tsx scripts/insight-report.ts",
     "tasks": "tsx scripts/task-extract.ts",
+    "wiki:entities": "tsx scripts/wiki-entities.ts",
     "wiki:health": "tsx scripts/wiki-health.ts",
     "weekly-review": "tsx scripts/weekly-review.ts",
     "start": "next start",
