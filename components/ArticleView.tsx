@@ -1,9 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import type { WikiArticle, WikiEvolutionEvent, WikiEvolutionRef } from '@/lib/wiki-loader';
 import type { GraphData } from '@/lib/graph-builder';
-import { ArrowLeft, Clock, Calendar, Hash, GitBranch, FileText, ExternalLink, History } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Hash, GitBranch, FileText, ExternalLink, History, Sparkles } from 'lucide-react';
 import { formatCategory } from '@/lib/utils';
 import SemanticTrail from '@/components/SemanticTrail';
 import MiniGraph from '@/components/MiniGraph';
@@ -61,10 +62,13 @@ function renderEvolutionRefs(refs: WikiEvolutionRef[]) {
 }
 
 export default function ArticleView({ article, backlinks, semanticTrail, miniGraph }: ArticleViewProps) {
+  const [isGraphOpen, setIsGraphOpen] = useState(true);
+  const hasGraph = Boolean(miniGraph && miniGraph.nodes.length > 0);
+
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-3xl">
       {/* Breadcrumb */}
-      <div className="mb-4 flex max-w-3xl items-center gap-2 text-sm text-muted-foreground">
+      <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
         <Link
           href="/"
           className="flex items-center gap-1 transition-colors duration-200 hover:text-foreground rounded focus-ring"
@@ -77,7 +81,7 @@ export default function ArticleView({ article, backlinks, semanticTrail, miniGra
       </div>
 
       {/* Header */}
-      <header className="mb-8 max-w-3xl border-b border-border pb-6">
+      <header className="mb-8">
         <div className="mb-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <h1 className="font-serif text-3xl font-normal tracking-tight text-heading text-balance sm:text-4xl">
             {article.title}
@@ -108,8 +112,7 @@ export default function ArticleView({ article, backlinks, semanticTrail, miniGra
         </div>
       </header>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,42rem)_16rem] lg:items-start">
-        <main className="min-w-0">
+      <main>
       {/* Semantic Trail — placed before Sources */}
       {semanticTrail && semanticTrail.length > 0 && (
         <SemanticTrail currentSlug={article.slug} trail={semanticTrail} />
@@ -267,10 +270,27 @@ export default function ArticleView({ article, backlinks, semanticTrail, miniGra
           </ul>
         </section>
       )}
-        </main>
+      </main>
 
-        {miniGraph && <MiniGraph data={miniGraph} focusSlug={article.slug} />}
-      </div>
+      {/* Floating Local Graph overlay + toggle */}
+      {hasGraph && miniGraph && (
+        <>
+          <MiniGraph
+            data={miniGraph}
+            focusSlug={article.slug}
+            open={isGraphOpen}
+            onClose={() => setIsGraphOpen(false)}
+          />
+          <button
+            onClick={() => setIsGraphOpen((v) => !v)}
+            className="fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-lg transition-all duration-200 hover:scale-105 hover:bg-secondary active:scale-95 focus-ring"
+            aria-label={isGraphOpen ? 'Hide local graph' : 'Show local graph'}
+            aria-pressed={isGraphOpen}
+          >
+            <Sparkles className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+        </>
+      )}
     </div>
   );
 }

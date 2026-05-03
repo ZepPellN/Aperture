@@ -20,7 +20,7 @@ export default function SemanticTrail({ currentSlug, trail }: SemanticTrailProps
   if (trail.length === 0) return null;
 
   return (
-    <section className="mt-10 border-t border-border pt-6">
+    <section className="mt-10">
       <div className="mb-4 flex items-center gap-2">
         <Compass className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
         <h2 className="text-lg font-medium text-heading">Semantic Trail</h2>
