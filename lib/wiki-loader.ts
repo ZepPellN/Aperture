@@ -497,6 +497,24 @@ function enrichSourcesWithContributions(
     .map((entry) => entry.source);
 }
 
+function fillDerivedSourceContributions(sources: WikiSource[]): WikiSource[] {
+  return sources.map((source) => {
+    if (source.contribution && source.contribution !== 'unknown') return source;
+
+    const contribution: SourceContributionLevel = sources.length === 1 ? 'high' : 'medium';
+    return {
+      ...source,
+      contribution,
+      sections: source.sections && source.sections.length > 0 ? source.sections : ['Whole page'],
+      summary:
+        source.summary ||
+        (contribution === 'high'
+          ? 'Primary source for this page.'
+          : 'Supporting source listed by this page.'),
+    };
+  });
+}
+
 export async function compileMarkdown(content: string): Promise<string> {
   const { html: transformed } = transformWikilinks(content);
 
@@ -532,12 +550,12 @@ export async function loadArticle(slug: string): Promise<WikiArticle | null> {
 
   const content = parsed.content;
   const sourceContributions = loadSourceContributions(slug);
-  const sources = enrichSourcesWithContributions(dedupeSources([
+  const sources = fillDerivedSourceContributions(enrichSourcesWithContributions(dedupeSources([
     ...extractSourcesFromContent(content),
     ...loadAbsorbLogSources(slug),
     ...sourcesFromFrontmatter(parsed.data.sources),
     ...sourcesFromContributions(sourceContributions),
-  ]), sourceContributions);
+  ]), sourceContributions));
   const displayContent = stripSourcesSection(content);
   const html = await compileMarkdown(displayContent);
   const words = displayContent.split(/\s+/).filter(Boolean).length;

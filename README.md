@@ -2,7 +2,7 @@
 
 A complete framework for building an LLM-compiled knowledge base.
 
-Aperture turns scattered documents into a structured, interlinked wiki — and renders it as a browsable website with search, backlinks, and an interactive knowledge graph. It is designed for the **AI agent workflow**: you drop raw sources, your agent ingests them, and the knowledge base evolves on its own.
+Aperture turns scattered documents into a structured, interlinked wiki — and renders it as a browsable website with search, backlinks, provenance, evolution history, local graphs, cluster exploration, and agent-readable APIs. It is designed for the **AI agent workflow**: you drop raw sources, your agent ingests them, and the knowledge base evolves over time while staying plain markdown.
 
 ---
 
@@ -12,7 +12,7 @@ This repository contains everything you need to build and maintain an LM Wiki:
 
 1. **BASIC_SCHEMA.md** — The "constitution" of your wiki. Defines how knowledge is organized, when to create or merge pages, and how to handle conflicts.
 2. **Wiki Skills** — Claude Code skills for ingest, absorb, query, cleanup, and maintenance.
-3. **Aperture Web Viewer** — A Next.js app that renders your wiki as a website with wikilinks, backlinks, and a knowledge graph.
+3. **Aperture Web Viewer** — A Next.js app that renders your wiki as a website with wikilinks, backlinks, sources, evolution, local graphs, semantic trails, and a full graph view.
 4. **Reference Vault** — A minimal example you can copy as a starting point.
 5. **AGENT_SETUP.md** — A guide for any AI agent to help you scaffold your wiki from scratch.
 
@@ -28,7 +28,7 @@ wiki/         # Compiled knowledge (markdown with wikilinks, maintained by AI)
 outputs/      # Generated answers and reports
 ```
 
-The web viewer reads `wiki/` at build time and renders it as a static site.
+The web viewer reads `wiki/` and wiki metadata at build time and renders a static site. Markdown remains the canonical data layer; JSON metadata adds provenance, evolution, and graph intelligence without making the wiki dependent on a private database.
 
 ---
 
@@ -65,11 +65,12 @@ Drop your scattered documents into `raw/`:
 
 #### 3. Install Wiki Skills
 
-Copy the skills to your project's `.claude/skills/` directory:
+Copy the skills to your project's `.agents/skills/` directory:
 
 ```bash
-mkdir -p /path/to/your/vault/.claude/skills
-cp -r .claude/skills/* /path/to/your/vault/.claude/skills/
+mkdir -p /path/to/your/vault/.agents/skills
+cp -r .agents/skills/wiki-* /path/to/your/vault/.agents/skills/
+cp .agents/skills/_wiki-common.md /path/to/your/vault/.agents/skills/
 ```
 
 #### 4. Ingest Your Sources
@@ -117,12 +118,13 @@ aperture/
 ├── BASIC_SCHEMA.md          # Universal wiki schema and editorial rules
 ├── AGENT_SETUP.md           # Step-by-step guide for AI agents
 ├── README.md                # This file
-├── .claude/
-│   └── skills/              # Claude Code skills for wiki maintenance
+├── .agents/
+│   └── skills/              # Codex/Claude-compatible skills for wiki maintenance
 │       ├── _wiki-common.md  # Shared standards
 │       ├── wiki-ingest/     # Router skill
 │       ├── wiki-inbox/      # Scan and ingest unabsorbed files
 │       ├── wiki-absorb/     # Re-process raw files
+│       ├── wiki-triage/     # Interactive save/skip intake for one source
 │       ├── wiki-query/      # Answer questions
 │       ├── wiki-cleanup/    # Audit and enrich articles
 │       ├── wiki-breakdown/  # Find missing articles
@@ -137,13 +139,107 @@ aperture/
 │   ├── page.tsx             # Homepage with stats
 │   ├── graph/
 │   │   └── page.tsx         # Knowledge graph view
+│   ├── clusters/
+│   │   └── page.tsx         # Semantic cluster browser
+│   ├── api/wiki/[...slug]/  # Per-page JSON API
+│   ├── llms.txt/            # Agent-readable short index
+│   ├── llms-full.txt/       # Agent-readable full index
 │   └── wiki/
 │       └── [...slug]/       # Individual article pages
 ├── components/              # React components
-├── lib/
-│   └── wiki-loader.ts       # Markdown parsing and wikilink extraction
+├── lib/                     # Markdown, graph, semantic, and metadata loaders
+├── scripts/                 # Export, health, entity, and graph proposal tools
 ├── next.config.ts
 └── package.json
+```
+
+---
+
+## Feature Guide
+
+The most important user-facing routes are:
+
+| Route | What it shows |
+|-------|---------------|
+| `/` | Search, recently updated pages, category cards, and latest update dates per category |
+| `/wiki/<slug>` | A wiki article with semantic trail, sources, contribution badges, evolution, backlinks, and a local graph |
+| `/graph?focus=<slug>` | A focused graph view for one article and its direct neighbors |
+| `/clusters` | Semantic clusters discovered across the wiki |
+| `/graph?cluster=<id>` | A graph view with one semantic cluster highlighted |
+| `/api/wiki/<slug>` | JSON for one article, including markdown, HTML, sources, backlinks, semantic neighbors, and evolution |
+| `/llms.txt` | Compact agent-readable wiki index |
+| `/llms-full.txt` | Full agent-readable wiki index with summaries and source counts |
+
+### Article Pages
+
+Open any `/wiki/<slug>` page to see the main reading experience.
+
+| Area | Purpose |
+|------|---------|
+| `View in Graph` button | Opens `/graph?focus=<slug>` for deeper graph exploration |
+| `Semantic Trail` | Shows related pages discovered from semantic neighbors |
+| `Sources` | Lists raw/wiki/web sources used to synthesize the page |
+| Contribution badge | Shows `high`, `medium`, or `low`; explicit metadata wins, otherwise Aperture derives a conservative fallback |
+| Source summary | Explains what that source contributed, such as `Primary source for this page.` |
+| Source sections | Shows the affected section, such as `Whole page` or explicit section names from metadata |
+| `Evolution` | Shows how the page was created, absorbed, merged, refined, or linked |
+| `From` / `To` | Shows source-to-page or page-to-page lineage |
+| `Linked from` | Backlinks from other wiki pages |
+| `Local Graph` | A small one-hop graph of the current article and direct neighbors |
+
+### Graph Views
+
+`/graph` has four modes: Network, Topo Map, Semantic, and Nest. Focused graph links always start in Network mode.
+
+| URL | Behavior |
+|-----|----------|
+| `/graph` | Full graph view |
+| `/graph?focus=<slug>` | Focus mode: shows the selected article and direct neighbors, with an `Open article` card |
+| `/graph?cluster=<id>` | Cluster mode: highlights a semantic island from `/clusters` |
+
+Focus mode intentionally renders a small subgraph instead of trying to center one node inside the full graph. This makes the feature usable on both desktop and mobile viewports.
+
+### Sources And Evolution Metadata
+
+Aperture reads source information from multiple compatible places:
+
+1. A page's `## Sources` markdown section.
+2. `wiki/_absorb_log.json`, which maps raw sources to touched wiki pages.
+3. Frontmatter `sources` arrays when present.
+4. `wiki/_source_contributions.json`, which records source contribution level, section, and summary.
+
+Evolution comes from `wiki/_evolution.json` when present. If no explicit evolution entry exists, Aperture derives a baseline event from the page's `created`, `date`, or `updated` frontmatter and its sources. That means older pages still show a useful `From source → To page` lineage instead of an empty section.
+
+Example contribution metadata:
+
+```json
+{
+  "ai-ecosystem/builder-2-collaborative-coding": [
+    {
+      "source": "raw/briefing/AI Briefing/2026-04-12.md",
+      "contribution": "high",
+      "sections": ["Whole page"],
+      "summary": "Primary source for this page."
+    }
+  ]
+}
+```
+
+Example evolution metadata:
+
+```json
+{
+  "ai-ecosystem/builder-2-collaborative-coding": [
+    {
+      "date": "2026-04-12",
+      "type": "absorbed",
+      "title": "Derived from source material",
+      "summary": "This page is currently synthesized from one source.",
+      "from": [{ "slug": "raw/briefing/AI Briefing/2026-04-12.md", "title": "AI Briefing" }],
+      "to": [{ "slug": "ai-ecosystem/builder-2-collaborative-coding", "title": "Builder 2.0" }]
+    }
+  ]
+}
 ```
 
 ---
@@ -157,6 +253,7 @@ All skills are invoked inside Claude Code with `/skill-name`.
 | Router | `/wiki-ingest` | Routes to specialized skills |
 | Inbox | `/wiki-inbox [limit]` | Scan `raw/` and ingest unabsorbed files |
 | Absorb | `/wiki-absorb [range]` | Re-compile raw files into wiki articles |
+| Triage | `/wiki-triage <raw-file-path>` | Read one high-value source, propose save/skip decisions, and wait for confirmation before writing |
 | Query | `/wiki-query "question"` | Answer questions across the wiki |
 | Cleanup | `/wiki-cleanup` | Audit and enrich all articles |
 | Breakdown | `/wiki-breakdown` | Find and create missing articles |
@@ -164,7 +261,9 @@ All skills are invoked inside Claude Code with `/skill-name`.
 | Rebuild Index | `/wiki-rebuild-index` | Regenerate `index.md` and `_backlinks.json` |
 | Reorganize | `/wiki-reorganize` | Rethink wiki structure |
 
-Read `.claude/skills/_wiki-common.md` for shared standards (vault paths, tracking state, ingest protocol, writing standards).
+Read `.agents/skills/_wiki-common.md` for shared standards (vault paths, tracking state, ingest protocol, writing standards).
+
+`/wiki-triage` is intentionally interactive. It proposes changes first and writes only after the user chooses `save 1`, `save all`, `skip`, or an edit instruction. This is the high-value single-source counterpart to batch `/wiki-absorb`.
 
 ---
 
@@ -246,8 +345,70 @@ The build process automatically generates semantic layouts and neighbor maps fro
 
 - **Cognitive Map** — UMAP projection of your wiki's semantic landscape (Graph page)
 - **Semantic Trail** — Related-article discovery paths on each article page
+- **Knowledge Clusters** — Semantic islands at `/clusters`
+- **Cluster Focus** — `/graph?cluster=<id>` highlights one island in the graph
 
 If qmd is not installed or the index is missing, the build falls back gracefully to link-based layouts only.
+
+---
+
+## Agent-Readable Interfaces
+
+Aperture exposes the wiki in formats that agents and scripts can consume directly:
+
+| Interface | Description |
+|-----------|-------------|
+| `/api/wiki/<slug>` | Full JSON for one page: title, content, HTML, frontmatter, sources, evolution, backlinks, semantic neighbors, reading time, and word count |
+| `/llms.txt` | Short index of article URLs and API endpoints |
+| `/llms-full.txt` | Full index with summaries, source counts, evolution counts, and source lists |
+
+Example:
+
+```bash
+curl http://localhost:3000/api/wiki/ai-ecosystem/builder-2-collaborative-coding
+curl http://localhost:3000/llms.txt
+curl http://localhost:3000/llms-full.txt
+```
+
+---
+
+## Maintenance Commands
+
+These commands produce files in `exports/`, which is ignored by git.
+
+| Command | Output | Purpose |
+|---------|--------|---------|
+| `npm run graph:proposal -- --focus <slug>` | `exports/graph-research/*.md` | Generate a research/triage proposal from one graph focus |
+| `npm run graph:proposal -- --cluster <id>` | `exports/graph-research/*.md` | Generate a research/triage proposal from one semantic cluster |
+| `npm run export:wiki` | `exports/wiki-snapshot-*.zip` | Export the current markdown wiki and metadata as a zip snapshot |
+| `npm run wiki:health` | `exports/wiki-health-*.md` | Report broken wikilinks, thin pages, long pages, pages without sources, orphan pages, and stale pages |
+| `npm run wiki:entities` | `exports/wiki-entities-*.md` and `.json` | Report page entities, candidate entities, aliases, confidence, and suggested wikilinks |
+
+Common examples:
+
+```bash
+WIKI_ROOT="/path/to/your/vault" npm run graph:proposal -- --focus ai-ecosystem/builder-2-collaborative-coding
+WIKI_ROOT="/path/to/your/vault" npm run graph:proposal -- --cluster 0
+WIKI_ROOT="/path/to/your/vault" npm run export:wiki
+WIKI_ROOT="/path/to/your/vault" npm run wiki:health
+WIKI_ROOT="/path/to/your/vault" npm run wiki:entities
+```
+
+The graph proposal flow does not write to the wiki directly. It creates markdown proposals that can be reviewed and then passed into `/wiki-triage` or `/wiki-absorb`.
+
+---
+
+## Validation Checklist
+
+Use this checklist after changing wiki viewer behavior:
+
+1. Open `/wiki/<slug>` and confirm `View in Graph`, `Sources`, contribution badge/summary, `Evolution`, backlinks, and `Local Graph`.
+2. Open `/graph?focus=<slug>` and confirm the focused article, direct neighbor count, and `Open article` card.
+3. Open `/clusters`, then a cluster's `View in Graph`, and confirm `/graph?cluster=<id>` highlights the cluster.
+4. Open `/`, confirm `Recently updated` and `Latest <date>` on category cards.
+5. Open `/api/wiki/<slug>`, `/llms.txt`, and `/llms-full.txt`.
+6. Run `npm run wiki:health`, `npm run wiki:entities`, `npm run graph:proposal`, and `npm run export:wiki`.
+7. Run `npm run build` before publishing.
 
 ## Deploying
 
