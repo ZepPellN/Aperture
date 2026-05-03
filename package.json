@@ -10,6 +10,7 @@
     "graph:proposal": "tsx scripts/graph-proposal.ts",
     "insight": "tsx scripts/insight-report.ts",
     "tasks": "tsx scripts/task-extract.ts",
+    "wiki:health": "tsx scripts/wiki-health.ts",
     "weekly-review": "tsx scripts/weekly-review.ts",
     "start": "next start",
     "lint": "eslint -c .config/eslint.config.mjs"
