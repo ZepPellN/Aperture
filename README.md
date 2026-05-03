@@ -4,21 +4,23 @@
 
 Aperture turns raw notes, links, transcripts, and daily logs into a browsable LLM Wiki. It keeps the source files in plain markdown, gives agents clean APIs to read them, and adds a life dashboard for tasks, habits, goals, journals, and weekly reviews.
 
-Give the repo to an agent, point it at your vault, and let it set up the wiki, install the skills, ingest sources, open the viewer, and verify the routes.
-
 ![Aperture wiki article with source provenance and local graph](docs/screenshots/wiki-article.png)
 
-## Use It
+## Agent Quick Start
 
-Ask your agent:
+Open this repo in your agent and say:
 
 ```text
-Set up Aperture for my vault. Read AGENT_SETUP.md and BASIC_SCHEMA.md, install the .agents/skills/wiki-* skills, configure WIKI_ROOT in .env.local, install dependencies, run the initial ingest and life maintenance commands, start the viewer, and verify /, /life, /wiki/<slug>, /graph, /clusters, /llms.txt, and /api/wiki/<slug>.
+Read AGENT_SETUP.md and set up Aperture for my vault.
 ```
 
-For a direct local run:
+The agent will scaffold your vault, install skills, ingest sources, and start the viewer.
+
+## Manual Setup
 
 ```bash
+git clone https://github.com/ZepPellN/Aperture.git
+cd Aperture
 npm install
 cp .env.example .env.local
 # Set WIKI_ROOT=/absolute/path/to/your/vault
