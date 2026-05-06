@@ -70,6 +70,10 @@ export default function RootLayout({
     >
       <head>
         <meta
+          name="google-site-verification"
+          content="kB39XO21j1Iq9RnIABdgM5WS5W0JGRm1ykt_1F_2xys"
+        />
+        <meta
           httpEquiv="Content-Security-Policy"
           content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; font-src 'self'; worker-src 'self' blob: 'unsafe-eval';"
         />
