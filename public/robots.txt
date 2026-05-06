@@ -1,9 +1,4 @@
-export const dynamic = 'force-static';
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aperture-daq.pages.dev';
-
-export async function GET() {
-  const body = `# Aperture — LLM-compiled wiki
+# Aperture — LLM-compiled wiki
 # https://github.com/ZepPellN/Aperture
 
 # Search & retrieval: allow
@@ -64,12 +59,4 @@ User-agent: Applebot
 Allow: /
 
 # Sitemap
-Sitemap: ${BASE_URL}/sitemap.xml
-`;
-
-  return new Response(body, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-    },
-  });
-}
+Sitemap: https://aperture-daq.pages.dev/sitemap.xml
