@@ -1,63 +1,67 @@
 export const dynamic = 'force-static';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://github.com/ZepPellN/Aperture';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aperture-daq.pages.dev';
 
 export async function GET() {
   const body = `# Aperture — LLM-compiled wiki
 # https://github.com/ZepPellN/Aperture
 
-# Allow all standard search engines
-User-agent: *
-Allow: /
-
-# AI training crawlers — allow indexing for discoverability
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: BingPreview
-Allow: /
-
-User-agent: Applebot
-Allow: /
-
-User-agent: Bytespider
-Allow: /
-
-User-agent: Meta-ExternalAgent
-Allow: /
-
-# AI search crawlers — these power real-time AI search results
+# Search & retrieval: allow
 User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: Claude-SearchBot
 Allow: /
 
-User-agent: Perplexity-User
-Allow: /
-
 User-agent: PerplexityBot
 Allow: /
 
-User-agent: DuckAssistBot
+# User-triggered: allow
+User-agent: ChatGPT-User
 Allow: /
 
-User-agent: YouBot
+User-agent: Claude-User
 Allow: /
 
-# llms.txt standard — point AI agents to machine-readable index
-User-agent: *
-Allow: /llms.txt
-Allow: /llms-zh.txt
-Allow: /llms-full.txt
-Allow: /llms-full-zh.txt
-Allow: /api/wiki/
+User-agent: Perplexity-User
+Allow: /
+
+# Training: block
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+# Opt-out tokens
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+# Undeclared: block
+User-agent: Bytespider
+Disallow: /
+
+User-agent: xAI-Grok
+Disallow: /
+
+# Standard search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Applebot
+Allow: /
 
 # Sitemap
 Sitemap: ${BASE_URL}/sitemap.xml

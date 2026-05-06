@@ -1,10 +1,26 @@
-# Aperture
+<div align="center">
+  <h1>Aperture</h1>
+  <p><b>A markdown-first wiki and life system for agent-native work.</b></p>
+  <a href="https://github.com/ZepPellN/Aperture/stargazers"><img src="https://img.shields.io/github/stars/ZepPellN/Aperture?style=flat-square" alt="Stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
+  <a href="https://x.com/plutozeppln"><img src="https://img.shields.io/badge/follow-@plutozeppln-black?style=flat-square&logo=X" alt="X"></a>
+</div>
 
-**A markdown-first wiki and life system for agent-native work.**
+## Why
 
-Aperture turns raw notes, links, transcripts, and daily logs into a browsable LLM Wiki. It keeps the source files in plain markdown, gives agents clean APIs to read them, and adds a life dashboard for tasks, habits, goals, journals, and weekly reviews.
+Every knowledge worker eventually faces the same problem: notes, bookmarks, transcripts, and journal entries scattered across tools that don't talk to each other. Notion, Obsidian, Logseq — each holds a fragment. When you ask an AI agent to help you think through something, it has no map of what you already know.
 
-![Aperture wiki article with source provenance and local graph](docs/screenshots/wiki-article.png)
+Aperture is that map. It keeps your source files in plain markdown, turns them into a structured knowledge graph, and gives both you and your agents clean APIs to read, navigate, and query the whole system. Knowledge work and life management stay in one file-first system that compounds over time.
+
+## What It Provides
+
+| Feature | Description |
+|---|---|
+| **LLM Wiki** | Browse `wiki/**/*.md` with wikilinks, backlinks, search, categories, and semantic trails. |
+| **Source Provenance** | Every article shows where it came from: source links, contribution levels, summaries, and evolution history. |
+| **Graph Exploration** | Navigate from any article into a focused knowledge graph, inspect semantic clusters, or browse by cluster. |
+| **Life Dashboard** | `/life` reads the same vault for journals, tasks, habits, mood, ideas, goals, and weekly reviews. |
+| **Agent Interfaces** | Consume the wiki through `/api/wiki/<slug>`, `/llms.txt`, `/llms-full.txt`, and bundled wiki skills. |
 
 ## Agent Quick Start
 
@@ -29,51 +45,15 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## What It Provides
+## Design
 
-### LLM Wiki
+Aperture is built on three constraints:
 
-Browse `wiki/**/*.md` as a polished web app with wikilinks, backlinks, search, categories, reading metadata, semantic trails, and local graph context.
-
-### Source Provenance
-
-Every article can show where it came from: source links, contribution levels, summaries, affected sections, and evolution history from earlier memories into later pages.
-
-### Graph Exploration
-
-Move from an article into `/graph?focus=<slug>`, inspect semantic clusters, or jump from `/clusters` into a cluster-focused graph. Graph rendering falls back gracefully when WebGL is unavailable.
-
-### Life Dashboard
-
-`/life` reads the same vault for daily journals, tasks, habits, mood, ideas, goals, weekly intent, and reviews. Knowledge work and life management stay in one file-first system.
-
-### Agent Interfaces
-
-Agents can consume the wiki through `/api/wiki/<slug>`, `/llms.txt`, `/llms-full.txt`, exports, health reports, entity reports, graph proposals, and the bundled wiki skills.
-
-## Screenshots
-
-| Wiki Article | Graph Focus |
-| --- | --- |
-| ![Article page showing sources, semantic trail, and local graph](docs/screenshots/wiki-article.png) | ![Focused graph route for an article](docs/screenshots/graph-focus.png) |
-
-| Life Dashboard | Knowledge Clusters |
-| --- | --- |
-| ![Life dashboard with tasks, habits, mood, and recent days](docs/screenshots/life-dashboard.png) | ![Cluster browser with semantic islands](docs/screenshots/clusters.png) |
-
-## Main Entry Points
-
-| Route | What you see |
-| --- | --- |
-| `/` | Search, recently updated pages, and category overview |
-| `/life` | Journals, tasks, habits, goals, weekly intent, and reviews |
-| `/wiki/<slug>` | Article, provenance, evolution, backlinks, semantic trail, and local graph |
-| `/graph?focus=<slug>` | Focused article graph |
-| `/clusters` | Semantic cluster browser |
-| `/graph?cluster=<id>` | Cluster-focused graph |
-| `/api/wiki/<slug>` | Article JSON for agents |
-| `/llms.txt` | Compact agent index |
-| `/llms-full.txt` | Full agent index |
+| Constraint | Rule |
+|---|---|
+| **Markdown-first** | Source files are plain markdown with YAML frontmatter. No lock-in, no proprietary format. |
+| **File-over-app** | Your data lives in your filesystem, not a database. The app is just a viewer. |
+| **Agent-native** | Every feature is designed so that AI agents can read, write, and maintain it programmatically. |
 
 ## Maintenance
 
@@ -87,8 +67,6 @@ npm run wiki:health
 npm run wiki:entities
 ```
 
-These commands generate reviewable artifacts for tasks, weekly reviews, graph research, wiki exports, health checks, entity detection, aliases, confidence, and suggested wikilinks.
-
 ## Build
 
 ```bash
@@ -98,7 +76,7 @@ npm run build
 Required environment:
 
 | Variable | Description |
-| --- | --- |
+|---|---|
 | `WIKI_ROOT` | Absolute path to the vault directory |
 | `QMD_INDEX` | Optional qmd index path for semantic features |
 
