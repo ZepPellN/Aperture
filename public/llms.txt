@@ -9,29 +9,55 @@
 - [README](https://github.com/ZepPellN/Aperture#readme)
 - [Author](https://x.com/plutozeppln)
 
-## About
+## What It Is
 
-Aperture is built for knowledge workers who want their notes to compound.
-Instead of scattering bookmarks, transcripts, and journal entries across tools that do not talk to each other,
-Aperture keeps everything in plain markdown and turns it into a structured knowledge graph.
-It gives both humans and AI agents clean APIs to read, navigate, and query the whole system.
-Knowledge work and life management — tasks, habits, goals, weekly reviews — stay in one file-first system.
+Aperture is a Next.js viewer that reads plain markdown files from your filesystem and compiles them into a structured knowledge system.
+It is not a note-taking app. It is a lens: you keep writing markdown as you always have, and Aperture renders it as something you and your agents can explore.
+
+## Core Capabilities
+
+### Wiki System
+- Article pages at `/wiki/<slug>` with rendered markdown, wikilink resolution, source provenance tracking, evolution timeline, backlinks, and semantic neighbor trails.
+- Homepage with keyword + semantic search, category browsing, recently-updated timeline, and stats.
+- Source provenance: every article tracks where its ideas came from (inline links, absorb logs, frontmatter, manual contributions) with contribution levels.
+
+### Graph Exploration (4 views)
+- **Network Graph** — Sigma.js WebGL force-directed graph. Focus mode, cluster highlighting, camera animation.
+- **Topo Map** — Canvas-based topographic density visualization using D3 contours. Category-colored glows, hover tooltips.
+- **Semantic Map** — Same topo visual language, laid out by UMAP semantic coordinates instead of force-directed placement.
+- **Nest Graph** — React Three Fiber 3D organic cluster. Seed-shaped nodes, animated growing edges, orbit controls.
+
+### Semantic Infrastructure
+- UMAP dimensionality reduction from text embeddings.
+- Cosine-similarity neighbor computation for semantic trails and random walk.
+- DBSCAN clustering for knowledge islands at `/clusters`.
+
+### Life Dashboard
+- `/life` compiles daily journals, weekly intents, habit trackers, and goals into a unified dashboard.
+- Weekly stats, intent cards (STOP/START/FORGIVE/SELF-CARE), next actions, mood timeline, habit heatmap, task velocity chart, life areas, and weekly reviews.
+
+### Agent APIs
+- `/api/wiki/<slug>` — JSON API returning slug, title, category, markdown, HTML, sources, backlinks, semantic neighbors, reading time, word count.
+- `/llms.txt` and `/llms-full.txt` — agent-readable system descriptions.
+- Bundled Claude Code skills in `.agents/skills/` for wiki maintenance.
 
 ## Core Routes
 
-- `/wiki/<slug>`: human-readable article page with sources, semantic trail, and local graph.
-- `/graph?focus=<slug>`: focused knowledge graph for an article.
-- `/clusters`: browse knowledge by semantic clusters.
-- `/life`: life dashboard (tasks, habits, mood, weekly reviews).
-- `/api/wiki/<slug>`: full JSON for an article (for AI consumption).
-- `/llms-full.txt`: complete article index.
+- `/` — Homepage: search, categories, recently updated, stats
+- `/wiki/<slug>` — Article page with provenance, evolution, backlinks, mini graph
+- `/graph` — Full-screen graph explorer with 4 view modes
+- `/clusters` — Semantic cluster browser
+- `/walk` — Random walk through semantic neighbors
+- `/life` — Personal life dashboard
+- `/api/wiki/<slug>` — JSON API for article data
+
+## Data Format
+
+- Source files: plain markdown with YAML frontmatter.
+- Wikilink syntax: `[[slug|label]]`.
+- Life data: custom markdown formats in `witness/` and `life-wiki/` directories.
+- No database. No proprietary format. File-over-app.
 
 ## Agent Onboarding
 
-Tell your agent to read `AGENT_SETUP.md` for full setup: scaffolding, skill installation, content ingestion, and viewer launch.
-
-## Article Index
-
-- [Agentic Coding](/wiki/concepts/agentic-coding) — /api/wiki/concepts/agentic-coding
-- [Claude Code](/wiki/entities/claude-code) — /api/wiki/entities/claude-code
-- [AI Coding Forecasts 2026](/wiki/forecasts/ai-coding-2026) — /api/wiki/forecasts/ai-coding-2026
+Tell your agent to read `AGENT_SETUP.md` for full setup: vault scaffolding, skill installation, content ingestion, and viewer launch.

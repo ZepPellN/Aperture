@@ -1,52 +1,188 @@
-# Aperture 完整文章索引
+# Aperture — 完整系统描述
 
-本文档是 Aperture Wiki 的完整机器可读索引，包含每篇文章的页面地址、JSON API 地址、摘要、来源及图谱元数据。
+> 一个面向 AI Agent 的 Markdown-first 个人 Wiki 系统。
+> 将原始笔记、链接、摘录和日常日志转换为可浏览的知识图谱，保留来源出处、语义关联、演化历史，并为 AI 提供结构化 API。
 
-如需获取单篇文章的完整 Markdown 与 HTML，请使用 `/api/wiki/<slug>`。
+## 链接
 
-- 总文章数: 3
-- 开源仓库: https://github.com/ZepPellN/Aperture
+- [开源仓库](https://github.com/ZepPellN/Aperture)
+- [项目主页](https://github.com/ZepPellN/Aperture#readme)
+- [作者](https://x.com/plutozeppln)
 
-## 文章列表
+## 设计哲学
 
-### Agentic Coding
+三条约束指导每一个设计决策：
 
-- Slug: concepts/agentic-coding
-- 分类: concepts
-- 页面: /wiki/concepts/agentic-coding
-- JSON: /api/wiki/concepts/agentic-coding
-- 更新日期: 2026-04-15
-- 字数: 266
-- 来源数: 1
-- 演化事件: 1
-- 摘要: Agentic Coding Agentic coding is the practice of using AI agents to write, review, and maintain software with minimal human intervention. The human defines the goal; the agent determines the implementation, tests its own code, and iterates...
-- 来源列表:
-  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+1. **Markdown-first** — 源文件是带 YAML frontmatter 的纯 Markdown。无锁定，无专有格式。
+2. **File-over-app** — 数据存于文件系统，而非数据库。应用只是查看器。
+3. **Agent-native** — 每个功能都设计为 AI Agent 可以以编程方式读取、写入和维护。
 
-### Claude Code
+## 架构
 
-- Slug: entities/claude-code
-- 分类: entities
-- 页面: /wiki/entities/claude-code
-- JSON: /api/wiki/entities/claude-code
-- 更新日期: 2026-04-15
-- 字数: 142
-- 来源数: 1
-- 演化事件: 1
-- 摘要: Claude Code Claude Code is Anthropic's agentic coding tool. It is a specific implementation of agentic coding principles, built on top of Claude (Sonnet/Opus models). Architecture Claude Code uses two core primitives: - Bash tool — execute...
-- 来源列表:
-  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+Aperture 是一个 Next.js 16 应用。它在构建时从 `WIKI_ROOT` 读取 Markdown 文件，编译为 HTML，计算图结构，并生成静态页面。
+语义功能（UMAP、邻居、聚类）由 `scripts/build-semantic.ts` 预先计算，以 JSON 形式存储于 `lib/`。
+生活数据由 `lib/life-loader.ts` 从 `witness/` 和 `life-wiki/` 目录解析。
 
-### AI Coding Forecasts 2026
+## Wiki 引擎
 
-- Slug: forecasts/ai-coding-2026
-- 分类: forecasts
-- 页面: /wiki/forecasts/ai-coding-2026
-- JSON: /api/wiki/forecasts/ai-coding-2026
-- 更新日期: 2026-04-15
-- 字数: 90
-- 来源数: 1
-- 演化事件: 1
-- 摘要: AI Coding Forecasts 2026 This page tracks predictions about the agentic coding landscape in 2026. Current Trajectory Agentic coding tools are moving from experimental to production. Key signals: - Enterprise adoption of Claude Code and Curs...
-- 来源列表:
-  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+### 文章渲染
+- Markdown 通过 `gray-matter` 解析 frontmatter。
+- HTML 通过 `unified` + `remark-gfm` + `remark-rehype` + `rehype-slug` + `rehype-stringify` 编译。
+- Wikilink（`[[slug|label]]`）解析为内部链接；断链标记。
+- 阅读时间和字数从纯文本计算。
+
+### 来源出处
+每篇文章从四个来源聚合来源信息：
+1. **正文链接** — 文章正文中找到的 URL 和 wikilink。
+2. **吸收日志** — `_absorb_log.json` 中记录的原始来源摄取记录。
+3. **Frontmatter** — YAML frontmatter 中的 `sources` 数组。
+4. **贡献记录** — `_source_contributions.json` 中的手动来源贡献。
+
+每个来源标注贡献度等级：高、中、低、未知。
+
+### 演化追踪
+文章历史存储于 `_evolution.json`。事件包括：创建、吸收、合并、拆分、重命名、精炼、链接。
+演化时间线显示在每篇文章页面底部。
+
+### 反向链接
+反向链接在构建时通过扫描所有文章的 wikilink 引用计算。
+`_backlinks.json` 缓存此数据。
+
+### 搜索
+- **关键词模式** — 标题和正文的子串匹配。
+- **语义模式** — 将结果扩展到关键词匹配的语义邻居。
+- 支持键盘导航（方向键、回车）。
+
+## 图谱系统
+
+### 数据模型
+- 节点 = 文章。大小与链接数成正比。颜色 = 分类。
+- 边 = wikilink。无向。
+- 局部图 = 焦点节点的 1 度邻居。
+
+### Network Graph（Sigma.js）
+- WebGL 渲染，SVG 降级。
+- 布局：ForceAtlas2（力导向）。
+- 交互：悬浮高亮节点+邻居；点击打开文章；聚焦模式隔离邻居；集群聚焦隔离分类。
+- 相机：聚焦变化时的动画过渡。
+- 主题感知调色板，支持亮色/暗色模式。
+
+### Topo Map（Canvas + D3）
+- 从节点位置计算密度场。
+- D3 等高线作为填充色带绘制。
+- 节点周围分类色晕。
+- 按距离透明度的边渲染。
+- 分类质心标签。
+- 悬浮提示显示链接统计。
+- 两种布局模式：力导向和 UMAP 语义。
+
+### Nest Graph（React Three Fiber）
+- 透视相机的 3D 场景。
+- 分类以圆形布局排列，simplex noise 扰动。
+- 节点渲染为有机"种子"形状（线段爆发）。
+- 边为动画生长弧线。
+- 集群悬浮高亮。
+- 点击时相机平滑聚焦。
+- 轨道控制：左键拖动平移，右键拖动旋转，滚轮缩放。
+- 选择卡片带"阅读文章"按钮。
+
+## 语义基础设施
+
+### 构建流水线（`scripts/build-semantic.ts`）
+1. 读取 qmd SQLite 向量数据库。
+2. 每篇文章对 chunk 嵌入做均值池化。
+3. 运行 UMAP 降维至 2D。
+4. 计算每篇文章的余弦相似度 top-5 邻居。
+5. 在 UMAP 坐标上运行 DBSCAN 聚类。
+
+### 输出
+- `lib/semantic-layout.json` — 每篇文章的 UMAP 2D 坐标。
+- `lib/semantic-neighbors.json` — 每篇文章的 top-5 邻居。
+- `lib/semantic-clusters.json` — DBSCAN 聚类，含质心和成员。
+
+## 生活仪表盘
+
+### 数据源
+- `witness/diary/` — 含心情、能量、习惯、任务的每日日记。
+- `witness/weekly/` — 每周意图文件（STOP/START/FORGIVE/SELF-CARE）。
+- `life-wiki/goals.md` — 按领域分类的目标列表。
+- `life-wiki/life-areas.md` — 生活领域定义。
+- `life-wiki/weekly-reviews/` — 生成的周回顾文件。
+- `life-wiki/tasks/` — 生成的周任务文件。
+
+### 组件
+- 统计栏：周数、待办/已完成/想法计数。
+- 意图卡片：四张彩色卡片对应每周意图。
+- 下一步行动：提取的行动项网格。
+- 心情时间线：柱状图（每天主导情绪 + 能量水平）。
+- 习惯热力图：运动、饮食、睡眠、补剂。
+- 任务速度：堆叠柱状图（每周待办 vs 已完成）。
+- 最近日记：可展开条目。
+- 生活领域：可折叠区域，显示目标数。
+- 2026 目标：按领域分组，可展开计划。
+- 周回顾：可折叠历史摘要。
+
+## Agent API
+
+### `/api/wiki/<slug>`
+返回 JSON：
+- `slug`、`title`、`category`
+- `content` — 原始 Markdown
+- `html` — 编译后的 HTML
+- `sources` — 来源对象数组（path、label、level、origin）
+- `backlinks` — 链接到本文的文章 slug 数组
+- `semanticNeighbors` — 邻居对象数组（slug、title、score）
+- `readingTime` — 分钟
+- `wordCount` — 整数
+
+### LLM 文本文件
+- `/llms.txt` — 简洁系统描述（英文）。
+- `/llms-zh.txt` — 简洁系统描述（中文）。
+- `/llms-full.txt` — 详细系统描述（英文）。
+- `/llms-full-zh.txt` — 详细系统描述（中文，本文件）。
+
+### 捆绑 Skills
+`.agents/skills/` 中的 Claude Code skills 包括：
+- `wiki-absorb` — 将原始来源摄取为 Wiki 文章。
+- `wiki-health` — 审计 Wiki 质量（断链、薄弱页面、孤儿）。
+- `wiki-query` — 自然语言查询 Wiki。
+- `wiki-triage` — 对比原始来源与现有文章。
+- `life-insight` — 生成每周洞察报告。
+- `life-intent` — 设定每周意图。
+- `life-reflect` — 每日反思提示。
+
+## 自动化脚本
+
+| 脚本 | 命令 | 用途 |
+|---|---|---|
+| `build-semantic.ts` | `npm run build:semantic` | 重建嵌入、UMAP、邻居、聚类 |
+| `generate-llms-txt.ts` | `npm run generate:llms-txt` | 重新生成 Agent 可读文本文件 |
+| `export-wiki.ts` | `npm run export:wiki` | 导出 Wiki 为带时间戳的 ZIP |
+| `graph-proposal.ts` | `npm run graph:proposal` | 为主题/聚类生成研究提案 |
+| `insight-report.ts` | `npm run insight` | 从自然语言查询生成主题报告 |
+| `task-extract.ts` | `npm run tasks` | 从日记和意图中提取任务 |
+| `weekly-review.ts` | `npm run weekly-review` | 从每日日记生成周回顾 Markdown |
+| `wiki-entities.ts` | `npm run wiki:entities` | 分析实体提及并建议链接 |
+| `wiki-health.ts` | `npm run wiki:health` | 审计 Wiki 健康和质量 |
+
+## 部署
+
+Agent 部署：阅读 `AGENT_SETUP.md`。
+
+手动部署：
+```bash
+git clone https://github.com/ZepPellN/Aperture.git
+cd Aperture
+npm install
+cp .env.example .env.local
+# 设置 WIKI_ROOT=/absolute/path/to/your/vault
+npm run dev
+```
+
+环境变量：
+- `WIKI_ROOT` — 仓库目录的绝对路径（必需）
+- `QMD_INDEX` — qmd SQLite 索引路径（可选，用于语义功能）
+
+## 许可证
+
+MIT

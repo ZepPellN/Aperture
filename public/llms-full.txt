@@ -1,52 +1,188 @@
-# Aperture Full Article Index
+# Aperture — Full System Description
 
-This file is a compact, agent-readable index of every wiki article, including stable page URLs, JSON API URLs, summaries, sources, and graph metadata counts.
+> A markdown-first wiki and life system for agent-native work.
+> It turns raw notes, links, transcripts, and daily logs into a browsable knowledge graph with source provenance, semantic trails, and agent APIs.
 
-Use `/api/wiki/<slug>` for full markdown and HTML of any individual article.
+## Links
 
-- Total articles: 3
-- Repository: https://github.com/ZepPellN/Aperture
+- [Repository](https://github.com/ZepPellN/Aperture)
+- [README](https://github.com/ZepPellN/Aperture#readme)
+- [Author](https://x.com/plutozeppln)
 
-## Articles
+## Philosophy
 
-### Agentic Coding
+Three constraints govern every decision:
 
-- Slug: concepts/agentic-coding
-- Category: concepts
-- Page: /wiki/concepts/agentic-coding
-- JSON: /api/wiki/concepts/agentic-coding
-- Updated: 2026-04-15
-- Words: 266
-- Sources: 1
-- Evolution events: 1
-- Summary: Agentic Coding Agentic coding is the practice of using AI agents to write, review, and maintain software with minimal human intervention. The human defines the goal; the agent determines the implementation, tests its own code, and iterates...
-- Source list:
-  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+1. **Markdown-first** — Source files are plain markdown with YAML frontmatter. No lock-in, no proprietary format.
+2. **File-over-app** — Your data lives in your filesystem, not a database. The app is just a viewer.
+3. **Agent-native** — Every feature is designed so that AI agents can read, write, and maintain it programmatically.
 
-### Claude Code
+## Architecture
 
-- Slug: entities/claude-code
-- Category: entities
-- Page: /wiki/entities/claude-code
-- JSON: /api/wiki/entities/claude-code
-- Updated: 2026-04-15
-- Words: 142
-- Sources: 1
-- Evolution events: 1
-- Summary: Claude Code Claude Code is Anthropic's agentic coding tool. It is a specific implementation of agentic coding principles, built on top of Claude (Sonnet/Opus models). Architecture Claude Code uses two core primitives: - Bash tool — execute...
-- Source list:
-  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+Aperture is a Next.js 16 application. It reads markdown files from `WIKI_ROOT` at build time, compiles them to HTML, computes graph structures, and generates static pages.
+Semantic features (UMAP, neighbors, clusters) are precomputed by `scripts/build-semantic.ts` and stored as JSON in `lib/`.
+Life data is parsed from `witness/` and `life-wiki/` directories by `lib/life-loader.ts`.
 
-### AI Coding Forecasts 2026
+## Wiki Engine
 
-- Slug: forecasts/ai-coding-2026
-- Category: forecasts
-- Page: /wiki/forecasts/ai-coding-2026
-- JSON: /api/wiki/forecasts/ai-coding-2026
-- Updated: 2026-04-15
-- Words: 90
-- Sources: 1
-- Evolution events: 1
-- Summary: AI Coding Forecasts 2026 This page tracks predictions about the agentic coding landscape in 2026. Current Trajectory Agentic coding tools are moving from experimental to production. Key signals: - Enterprise adoption of Claude Code and Curs...
-- Source list:
-  - The Rise of Agentic Coding (raw/to-learn/example-article.md)
+### Article Rendering
+- Markdown parsed with `gray-matter` for frontmatter.
+- HTML compiled with `unified` + `remark-gfm` + `remark-rehype` + `rehype-slug` + `rehype-stringify`.
+- Wikilinks (`[[slug|label]]`) are resolved to internal links; broken links are marked.
+- Reading time and word count are computed from plain text.
+
+### Source Provenance
+Every article aggregates sources from four origins:
+1. **Body links** — URLs and wikilinks found in the article body.
+2. **Absorb logs** — Records from `_absorb_log.json` tracking when raw sources were ingested.
+3. **Frontmatter** — `sources` array in YAML frontmatter.
+4. **Contributions** — Manual source contributions from `_source_contributions.json`.
+
+Each source receives a contribution level: high, medium, low, or unknown.
+
+### Evolution Tracking
+Article histories are stored in `_evolution.json`. Events include: created, absorbed, merged, split, renamed, refined, linked.
+The evolution timeline is displayed on every article page.
+
+### Backlinks
+Backlinks are computed at build time by scanning all articles for wikilink references.
+The `_backlinks.json` file caches this data.
+
+### Search
+- **Keyword mode** — substring matching on title and content.
+- **Semantic mode** — expands results to include semantic neighbors of keyword matches.
+- Keyboard navigation (arrow keys, Enter) supported.
+
+## Graph System
+
+### Data Model
+- Nodes = articles. Size proportional to link count. Color = category.
+- Edges = wikilinks. Undirected.
+- Local graph = 1-degree neighborhood of a focus node.
+
+### Network Graph (Sigma.js)
+- WebGL rendering with SVG fallback.
+- Layout: ForceAtlas2 (force-directed).
+- Interactions: hover highlights node + neighbors; click opens article; focus mode isolates neighborhood; cluster focus isolates category.
+- Camera: animated transitions on focus change.
+- Theme-aware palettes for light/dark mode.
+
+### Topo Map (Canvas + D3)
+- Density field computed from node positions.
+- D3 contours drawn as filled bands.
+- Category-colored glows around nodes.
+- Edge rendering with opacity by distance.
+- Category centroid labels.
+- Hover tooltips with link stats.
+- Two layout modes: force-directed and UMAP semantic.
+
+### Nest Graph (React Three Fiber)
+- 3D scene with perspective camera.
+- Categories arranged in circular layout with simplex noise perturbation.
+- Nodes rendered as organic "seed" shapes (line-segment bursts).
+- Edges as animated growing arcs.
+- Cluster hover highlighting.
+- Camera smooth-focus on click.
+- Orbit controls: left-drag pan, right-drag rotate, scroll zoom.
+- Selection card with "Read article" button.
+
+## Semantic Infrastructure
+
+### Build Pipeline (`scripts/build-semantic.ts`)
+1. Reads qmd SQLite vector database.
+2. Mean-pools chunk embeddings per article.
+3. Runs UMAP dimensionality reduction to 2D.
+4. Computes cosine-similarity top-5 neighbors per article.
+5. Runs DBSCAN clustering on UMAP coordinates.
+
+### Outputs
+- `lib/semantic-layout.json` — UMAP 2D coordinates per slug.
+- `lib/semantic-neighbors.json` — Top-5 neighbors per slug.
+- `lib/semantic-clusters.json` — DBSCAN clusters with centroids and members.
+
+## Life Dashboard
+
+### Data Sources
+- `witness/diary/` — Daily journal entries with mood, energy, habits, tasks.
+- `witness/weekly/` — Weekly intent files (STOP/START/FORGIVE/SELF-CARE).
+- `life-wiki/goals.md` — Goal lists by domain.
+- `life-wiki/life-areas.md` — Life area definitions.
+- `life-wiki/weekly-reviews/` — Generated weekly review files.
+- `life-wiki/tasks/` — Generated weekly task files.
+
+### Components
+- Stats bar: week number, pending/completed/ideas counts.
+- Intent cards: four colored cards for weekly intentions.
+- Next actions: grid of extracted action items.
+- Mood timeline: bar chart (dominant emotion + energy level per day).
+- Habit heatmap: exercise, meals, sleep, supplements.
+- Task velocity: stacked bar chart (pending vs done per week).
+- Recent diaries: expandable entries.
+- Life areas: collapsible sections with goal counts.
+- 2026 goals: domain-grouped with expandable plans.
+- Weekly reviews: collapsible historical summaries.
+
+## Agent APIs
+
+### `/api/wiki/<slug>`
+Returns JSON:
+- `slug`, `title`, `category`
+- `content` — raw markdown
+- `html` — compiled HTML
+- `sources` — array of source objects (path, label, level, origin)
+- `backlinks` — array of slugs that link to this article
+- `semanticNeighbors` — array of neighbor objects (slug, title, score)
+- `readingTime` — minutes
+- `wordCount` — integer
+
+### LLM Text Files
+- `/llms.txt` — Compact system description (English).
+- `/llms-zh.txt` — Compact system description (Chinese).
+- `/llms-full.txt` — Detailed system description (English, this file).
+- `/llms-full-zh.txt` — Detailed system description (Chinese).
+
+### Bundled Skills
+Claude Code skills in `.agents/skills/` include:
+- `wiki-absorb` — Ingest raw sources into wiki articles.
+- `wiki-health` — Audit wiki quality (broken links, thin pages, orphans).
+- `wiki-query` — Query the wiki with natural language.
+- `wiki-triage` — Compare raw sources against existing articles.
+- `life-insight` — Generate weekly insight reports.
+- `life-intent` — Set weekly intentions.
+- `life-reflect` — Daily reflection prompts.
+
+## Automation Scripts
+
+| Script | Command | Purpose |
+|---|---|---|
+| `build-semantic.ts` | `npm run build:semantic` | Rebuild embeddings, UMAP, neighbors, clusters |
+| `generate-llms-txt.ts` | `npm run generate:llms-txt` | Regenerate agent-readable text files |
+| `export-wiki.ts` | `npm run export:wiki` | Export wiki as timestamped ZIP |
+| `graph-proposal.ts` | `npm run graph:proposal` | Generate research proposals for topics/clusters |
+| `insight-report.ts` | `npm run insight` | Generate themed reports from natural language queries |
+| `task-extract.ts` | `npm run tasks` | Extract tasks from journals and intents |
+| `weekly-review.ts` | `npm run weekly-review` | Generate weekly review Markdown from daily journals |
+| `wiki-entities.ts` | `npm run wiki:entities` | Analyze entity mentions and suggest links |
+| `wiki-health.ts` | `npm run wiki:health` | Audit wiki health and quality |
+
+## Setup
+
+For agents: read `AGENT_SETUP.md`.
+
+For manual setup:
+```bash
+git clone https://github.com/ZepPellN/Aperture.git
+cd Aperture
+npm install
+cp .env.example .env.local
+# Set WIKI_ROOT=/absolute/path/to/your/vault
+npm run dev
+```
+
+Environment variables:
+- `WIKI_ROOT` — Absolute path to the vault directory (required)
+- `QMD_INDEX` — Path to qmd SQLite index (optional, for semantic features)
+
+## License
+
+MIT
