@@ -1,37 +1,40 @@
 ---
 name: wiki-daily-update
 description: >
-  Daily maintenance: absorb new raw/to-learn files from the last 24 hours,
-  refresh the QMD vector index, and generate writing prompts for witness.
+  Daily maintenance: classify new raw files, absorb durable knowledge,
+  optionally run raw emergence, refresh the QMD vector index, and generate
+  writing prompts for witness.
   Invoke when the user says /wiki-daily-update or when the daily cron job fires.
 argument-hint: "[run]"
 ---
 
 # Wiki Daily Update
 
-Process newly added `raw/to-learn` files from the last 24 hours, absorb them
-into wiki articles, refresh QMD, and generate writing prompts for witness.
+Process newly added raw files from the last 24 hours. Durable knowledge may be
+absorbed into wiki articles. One-off material stays in `raw/`. Cross-source
+patterns should go through `/wiki-emerge` and land in `outputs/ideas/` before
+they become wiki pages.
 
-**Read `.claude/skills/_wiki-common.md` for shared standards** (Vault & Paths,
+**Read `.agents/skills/_wiki-common.md` for shared standards** (Vault & Paths,
 Tracking State, Ingest Protocol, Writing Standards).
 
 ## When to Run
 
 - Manually: user says `/wiki-daily-update`
-- Automatically: cron fires at 03:00 local time every day
+- Automatically: OpenClaw or cron fires on the configured schedule
 
 ## Steps
 
 ### 1. Discover New Files
 
-Find markdown files in `raw/to-learn/` modified within the last 24 hours:
+Find markdown files in `raw/` modified within the last 24 hours:
 
 ```bash
-find "$VAULT/raw/to-learn" -name "*.md" -mtime -1 | sort
+find "$VAULT/raw" -name "*.md" -mtime -1 | sort
 ```
 
-If no files found, report "No new files in the last 24h" and skip to step 4
-(QMD refresh + prompts only).
+If no files are found, report "No new raw files in the last 24h" and skip to
+step 4 (optional emergence, QMD refresh, prompts).
 
 ### 2. Check Absorb Log
 
@@ -41,31 +44,35 @@ Read `wiki/_absorb_log.json`. For each candidate file:
 2. If path + hash matches the log → skip
 3. Otherwise → add to processing queue
 
-### 3. Absorb Queue
+### 3. Classify and Absorb Queue
 
-For each queued file, execute the **Ingest Protocol** from `_wiki-common.md`:
+For each queued file, classify before absorbing:
 
 1. **Read the source fully.**
 2. **Read `CLAUDE.md`** for schema and Theme Aggregation Rules.
-3. **Match against wiki index.** What existing articles does this touch?
-4. **Update existing articles or create new ones.** Integrate so the article
-   reads as a coherent whole. Never just append.
-5. **Connect to patterns.** Ensure concept articles capture recurring themes.
-6. **Append to `wiki/_absorb_log.json`.**
-7. **Append to `wiki/log.md`.**
-
-**Source priority override:** All queued files come from `raw/to-learn/`, so
-treat every file as Priority 1 (backbone source).
+3. Decide whether the source is one-off material, entity/tool evidence,
+   reusable concept material, durable synthesis, or output seed.
+4. If durable, execute the Ingest Protocol from `_wiki-common.md`.
+5. If it is one-off, keep it in `raw/` and log or report `skipped_one_off`.
+6. If it needs cross-source confirmation, put it on the emergence queue instead
+   of creating a wiki page.
 
 **Anti-cramming / Anti-thinning:** Follow the same rules as `wiki-absorb`.
 
 **Candidate handling:** Follow Candidate System from `_wiki-common.md`:
-- Single-source new pages → `status: candidate`
+- Single-source new durable concept pages → `status: candidate` and
+  `knowledge_status: ai_draft` or `hypothesis`
 - Second source enriching candidate → promote to mature, rewrite with Concept Page Template
 
 **After every 5 files:** Rebuild `wiki/index.md` and `wiki/_backlinks.json`.
 
-### 4. Refresh QMD
+### 4. Optional Raw Emergence
+
+If 5+ raw files were discovered, or if the run is weekly/monthly, execute
+`/wiki-emerge last 7 days` after the absorb queue. The emergence report should
+be saved under `outputs/ideas/` and should not directly modify wiki pages.
+
+### 5. Refresh QMD
 
 Regardless of whether new files were absorbed, update the QMD index and
 embeddings so the vector DB reflects the latest wiki state:
@@ -76,7 +83,7 @@ qmd update && qmd embed
 
 Report the QMD status after refresh (file count, vector count).
 
-### 5. Generate Prompts for Witness
+### 6. Generate Prompts for Witness
 
 After absorption is complete, scan today's changes and generate writing prompts
 that bridge compiled knowledge with personal reflection.
@@ -124,13 +131,15 @@ Based on today's wiki updates:
 - Reference Jean's current projects when relevant (read `wiki/self/goals-tracking`)
 - Avoid generic prompts like "what do you think about X?"
 
-### 6. Report
+### 7. Report
 
 Summarize:
 - Files discovered (last 24h)
-- Files skipped (already absorbed)
-- Files absorbed (new or changed)
+- Files skipped (already absorbed, one-off, duplicate, or out of scope)
+- Files absorbed (durable knowledge)
+- Files sent to emergence / ideas
 - Wiki pages touched / created / promoted
 - Candidates created / promoted
+- Ideas report path, if generated
 - QMD status (files indexed, vectors embedded)
 - Prompts for witness generated (count + file path)

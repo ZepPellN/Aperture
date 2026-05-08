@@ -1,70 +1,42 @@
 ---
 name: wiki-ingest-status
-description: Sub-skill for /wiki-ingest status. Report wiki health metrics.
+description: Legacy sub-skill for /wiki-ingest status. Delegates to wiki-status.
 parent: wiki-ingest
 ---
 
-# Wiki Status
+# Wiki Ingest Status
 
-Run when the user invokes `/wiki-ingest status`.
+This legacy sub-skill is kept for compatibility with old `/wiki-ingest status`
+calls. Prefer the standalone `/wiki-status` skill.
 
-## Report Metrics
+If this file is read directly, report the canonical `/wiki-status` metrics plus
+the v2 schema metrics below.
 
-1. **Raw Files**
-   - Total files in `raw/` (recursive)
-   - Absorbed count (from `_absorb_log.json` entries with status "absorbed")
-   - Pending count (total - absorbed - skipped)
-   - Skipped count (empty/duplicate/failed)
+## Required Metrics
 
-2. **Wiki Pages**
-   - Total pages (from `wiki/index.md` count or file system scan)
-   - Orphan pages (no inbound wikilinks from other wiki pages)
-   - Thin pages (<100 words body text)
-   - Crammed pages (>3000 words body text)
-   - Stale pages (frontmatter `updated` older than 30 days)
-   - Pages with `sources: 1` (merge candidates)
+- Raw files: total, absorbed, pending, skipped, `skipped_one_off`, and
+  `idea_candidate` counts from `_absorb_log.json` when available.
+- Wiki pages by section.
+- Most-connected pages, orphans, thin pages, crammed pages, stale pages, and
+  broken wikilinks.
+- Schema adoption:
+  - pages missing `page_kind`
+  - `concept`, `moc`, or `synthesis` pages missing `knowledge_status`
+  - pages missing `judgment_owner`
+- Draft judgment load:
+  - count and oldest examples of `knowledge_status: ai_draft`
+  - count and oldest examples of `knowledge_status: hypothesis`
+- MOC quality for:
+  - `claude-code/overview`
+  - `harness-engineering/overview`
+  - `product-trends/overview`
+- Concept quality:
+  - missing required concept sections
+  - concept pages over 150 lines
+  - source summaries mislabeled as concepts
 
-3. **Section Breakdown**
-   - Count per section (harness-engineering/, claude-code/, ai-ecosystem/, etc.)
+## Behavior
 
-## Output Format
-
-```markdown
-# Wiki Status Report — YYYY-MM-DD
-
-## Raw Sources
-| Metric | Count |
-|--------|-------|
-| Total raw files | N |
-| Absorbed | N |
-| Pending | N |
-| Skipped | N |
-
-## Wiki Pages
-| Metric | Count |
-|--------|-------|
-| Total pages | N |
-| Orphans | N |
-| Thin (<100 words) | N |
-| Crammed (>3000 words) | N |
-| Stale (>30d) | N |
-| Single-source (merge candidates) | N |
-
-## By Section
-| Section | Pages |
-|---------|-------|
-| harness-engineering | N |
-| claude-code | N |
-| ... | ... |
-
-## Recommendations
-- Run `/wiki-ingest cleanup` to audit quality
-- Run `/wiki-ingest reorganize` to check for merge candidates
-```
-
-## Tool Preferences
-
-- Count files: `find "$VAULT/raw" -type f | wc -l`
-- Count words: `wc -w`
-- Parse frontmatter: Obsidian CLI or Python `yaml.safe_load`
-- Parse wikilinks: grep `\[\[...\]\]` patterns
+- Read-only.
+- Report issues only. Do not modify files.
+- Use Obsidian CLI for vault reads where practical.

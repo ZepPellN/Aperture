@@ -1,17 +1,18 @@
 ---
 name: wiki-inbox
 description: >
-  Scan raw/ for unabsorbed files and process them into the wiki.
+  Scan raw/ for unabsorbed files, classify them, and route them to absorb,
+  emerge, or raw-only handling.
   Invoke when the user says /wiki-inbox or wants to process new raw files.
 argument-hint: "[limit]"
 ---
 
 # Wiki Inbox
 
-Scan `raw/` for all unabsorbed files and ingest them. This is the entry-point
-for daily maintenance.
+Scan `raw/` for unabsorbed files and classify them. This is the entry point for
+daily maintenance, but it must not assume every raw file deserves a wiki page.
 
-**Read `.claude/skills/_wiki-common.md` for shared standards** (Vault & Paths,
+**Read `.agents/skills/_wiki-common.md` for shared standards** (Vault & Paths,
 Tracking State, Ingest Protocol, Classification Rules, Writing Standards).
 
 ## Steps
@@ -23,7 +24,16 @@ Tracking State, Ingest Protocol, Classification Rules, Writing Standards).
    - Add to queue if not found or hash changed.
 4. If `[limit]` provided, process only the `limit` most recent candidates.
 5. If no `[limit]`, process **all** unabsorbed candidates.
-6. For each candidate, execute the **Ingest Protocol** from `_wiki-common.md`.
+6. For each candidate, classify it before absorbing:
+   - `absorb_now`: durable concept/entity/tool/synthesis material.
+   - `emerge_later`: interesting pattern that needs cross-source confirmation.
+   - `raw_only`: one-off news, duplicate update, ordinary briefing item, or
+     source material with no reusable insight.
+   - `ask_jean`: judgment depends on Jean's priorities.
+7. Execute the Ingest Protocol only for `absorb_now` files.
+8. Add `emerge_later` files to a `/wiki-emerge` run, preferably scoped to the
+   same date range.
+9. Report `raw_only` files with reasons. Do not create wiki pages for them.
 
 ## Source Priority
 
@@ -34,6 +44,28 @@ Tracking State, Ingest Protocol, Classification Rules, Writing Standards).
 | 3 | `raw/newsletters/` | Interest signals. Update existing articles. Never create per-newsletter pages. |
 | 4 | `raw/twitter/` | Highly selective. Only standalone threads or builder insights. |
 | 5 | `raw/tools/` | Reference notes. Update tool lists or category pages. |
+
+## Output Routing
+
+| Classification | Destination |
+|----------------|-------------|
+| `absorb_now` | `/wiki-absorb <file>` |
+| `emerge_later` | `/wiki-emerge <date-range>` and `outputs/ideas/` |
+| `raw_only` | Leave in `raw/`; optionally log `skipped_one_off` |
+| `ask_jean` | Include in Pending Jean review |
+
+## Required Report
+
+End every run with:
+
+- Files scanned
+- Files already absorbed
+- Files routed to `absorb_now`
+- Files routed to `emerge_later`
+- Files kept as `raw_only`
+- Files requiring Jean review
+- Any wiki pages created or updated
+- Any ideas report created
 
 ## Anti-Cramming
 

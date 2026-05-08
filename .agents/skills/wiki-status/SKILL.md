@@ -42,3 +42,25 @@ Show wiki health stats.
 
 8. **Broken wikilinks**
    - `[[links]]` in wiki pages that point to non-existent targets
+
+9. **Wiki v2 schema adoption**
+   - New or recently updated pages missing `page_kind`
+   - `concept`, `moc`, or `synthesis` pages missing `knowledge_status`
+   - Pages marked `human_verified` without clear Jean or witness provenance
+
+10. **Draft judgment load**
+   - Count pages with `knowledge_status: ai_draft`
+   - Count pages with `knowledge_status: hypothesis`
+   - List the oldest 10 draft/hypothesis pages for Jean review
+
+11. **MOC quality**
+   - Check `claude-code/overview`, `harness-engineering/overview`, and
+     `product-trends/overview` for required MOC sections:
+     Core Questions, Key Concepts, Main Tensions, Current Judgments,
+     To Read / To Verify, Output Directions
+   - Flag MOCs that are only link lists without connective explanation
+
+12. **Concept quality**
+   - Concept pages missing What it is / Why it matters / Evidence across sources / Open questions / Related / Sources
+   - Concept pages over 150 lines or covering multiple separable ideas
+   - Source-summary pages mislabeled as concepts

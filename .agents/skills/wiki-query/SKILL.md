@@ -12,7 +12,7 @@ argument-hint: "<question>"
 
 Answer questions about the wiki by navigating compiled articles.
 
-**Read `.claude/skills/_wiki-common.md` for vault paths and Writing Standards**
+**Read `.agents/skills/_wiki-common.md` for vault paths and Writing Standards**
 (needed only if synthesis write-back is triggered).
 
 ## How to Answer
@@ -88,9 +88,16 @@ Use direct quotes sparingly. Connect dots across articles. Acknowledge gaps.
 
 ## Saving Outputs
 
-After answering, save the response as a markdown file in `$VAULT/outputs/` with a
-descriptive filename (e.g., `outputs/2026-04-20-agent-native-principles.md`).
-Include the original question and the synthesized answer.
+After answering, classify the result before saving:
+
+| Result type | Destination |
+|-------------|-------------|
+| One-off answer or report | `$VAULT/outputs/` |
+| Idea that may become writing | `$VAULT/outputs/ideas/` |
+| Active draft | `$VAULT/outputs/drafts/` |
+| Durable concept or synthesis | `wiki/` write-back after the checks below |
+
+Include the original question and the synthesized answer in any output file.
 
 ## Synthesis Write-Back
 
@@ -107,17 +114,24 @@ After saving to `outputs/`, evaluate whether the answer qualifies for wiki write
    bridge page that links both `wiki/` and `witness/` content.
 
 **If all conditions are met:**
-1. Determine the best target: an existing wiki page that should gain a new section,
+1. Determine whether the write-back is `page_kind: concept`, `moc`, or `synthesis`.
+   If it is one-off, save to `outputs/` only.
+2. Determine the best target: an existing wiki page that should gain a new section,
    or a new page if the synthesis represents a standalone concept.
-2. For witness-aware synthesis: target `wiki/self/` or create a bridge page.
-3. Place the article in the most relevant existing section. If no section fits,
+3. For witness-aware synthesis: target `wiki/self/` or create a bridge page.
+4. Place the article in the most relevant existing section. If no section fits,
    create a new one following topic-driven rules (not a catch-all).
-4. Write the synthesis following Writing Standards from `_wiki-common.md`.
-   - Frontmatter: `title`, `section`, `sources: N`, `updated: YYYY-MM-DD`
+5. Write the synthesis following Writing Standards from `_wiki-common.md`.
+   - Frontmatter: `title`, `section`, `sources: N`, `updated: YYYY-MM-DD`,
+     `page_kind`, `knowledge_status`, `source_type`, `judgment_owner`
+   - AI-created durable synthesis defaults to `knowledge_status: ai_draft`
    - Link back to every source wiki page with `[[wikilinks]]`
-   - Link to the output file: `[[outputs/filename.md|Query: ...]]`
-5. Update `wiki/index.md` if a new page was created.
-6. Update `wiki/_backlinks.json` for any new wikilinks.
+   - Do not make concept pages depend on one-off output artifacts. Outputs may
+     cite wiki pages, but wiki concept pages should stand on wiki/raw sources.
+6. Update `wiki/index.md` if a new page was created.
+7. Update `wiki/_backlinks.json` for any new wikilinks.
+8. End with a **Pending Jean review** section for every durable page left as
+   `ai_draft` or `hypothesis`.
 
 **If conditions are not met:** save to `outputs/` only.
 
@@ -128,3 +142,4 @@ After saving to `outputs/`, evaluate whether the answer qualifies for wiki write
 - For wiki-only queries: Never read raw source files (`raw/`). The wiki is the knowledge base.
 - For witness-aware queries: `witness/` is read-only. Never modify witness entries.
 - Read-only **except** for synthesis write-back when all conditions above are met.
+- Never mark query write-back as `human_verified` unless Jean explicitly says so.
