@@ -15,6 +15,8 @@ Ingest Protocol, Classification Rules, or vault paths.
 
 Always read `CLAUDE.md` before performing an ingest or absorb.
 Always read `wiki/_absorb_log.json` before processing raw files to avoid duplicates.
+For raw emergence runs, read the pilot MOCs before scanning raw sources so the
+report is anchored to active questions instead of becoming a generic digest.
 
 ## Directory Structure
 
@@ -33,7 +35,91 @@ wiki/
   _backlinks.json              # Reverse link index
   {section}/                   # Topic sections
 outputs/                       # Generated answers from /wiki-query
+  ideas/                       # Durable ideas that may become drafts
+  drafts/                      # Active article/report drafts
+  ready/                       # Ready-to-publish artifacts
+  published/                   # Published artifacts
 ```
+
+## Permanent Knowledge vs One-Off Material
+
+`raw/` stores source material. `wiki/` stores durable knowledge. `outputs/`
+stores one-off answers, reports, drafts, and published artifacts.
+
+Do not turn a briefing, newsletter, tweet, or XHS note into a standalone wiki
+page just because it exists. First decide what kind of material it contains:
+
+| Material | Destination |
+|----------|-------------|
+| Pure news, duplicate updates, one-off facts | Keep in `raw/`, log absorb/skipped status |
+| Reusable facts about a person, product, tool, or project | Update `page_kind: entity` or `tool` page |
+| Reusable insight or framework | Create/update `page_kind: concept` |
+| Cross-page synthesis with durable value | Create/update `page_kind: synthesis` or a MOC |
+| One-off answer, report, draft, or publication | Save under `outputs/` |
+
+`outputs/` may cite `wiki/`, but concept pages should not depend on a specific
+output artifact.
+
+## Page Kinds and Judgment Status
+
+New or substantially updated wiki pages should include:
+
+```yaml
+page_kind: overview | concept | entity | tool | synthesis | moc | output
+knowledge_status: ai_draft | human_verified | hypothesis | disputed | reference
+source_type: article | tweet | newsletter | briefing | xhs | conversation | personal_judgment
+judgment_owner: ai | jean | mixed
+```
+
+Keep the existing `sources`, `status`, `section`, and `updated` fields. `status`
+tracks source maturity. `knowledge_status` tracks judgment confidence.
+
+Rules:
+- AI-created or AI-substantially-rewritten concepts default to `knowledge_status: ai_draft`.
+- AI must not set `knowledge_status: human_verified` unless Jean explicitly confirms it.
+- Use `hypothesis` when a claim is plausible but under-sourced.
+- Use `disputed` when sources conflict or Jean rejects the claim.
+- `personal_judgment` requires explicit Jean input or `witness/` evidence.
+
+## MOC Pages
+
+`page_kind: moc` pages are living Maps of Content, not flat link lists. The first
+MOC pilots are `wiki/claude-code/overview.md`,
+`wiki/harness-engineering/overview.md`, and
+`wiki/product-trends/overview.md`.
+
+Each MOC/overview should include:
+
+```markdown
+## Core Questions
+## Key Concepts
+## Main Tensions
+## Current Judgments
+## To Read / To Verify
+## Output Directions
+```
+
+MOC pages should explain how linked pages relate to the topic. If current
+judgments are AI-authored, mark them as draft or hypothesis.
+
+## Absorb Decisions
+
+Every absorb run must make these decisions before writing durable knowledge:
+
+1. **Create an atomic concept?** Create `page_kind: concept` only when the
+   source contains one reusable insight that cannot be integrated cleanly into
+   an existing concept. Single-source concepts stay `status: candidate` and
+   `knowledge_status: ai_draft` or `hypothesis`.
+2. **Update a parent concept?** Prefer enriching an existing parent concept over
+   creating a thin page. When a new atomic concept is created, update the parent
+   concept or related overview with a wikilink and a short relationship note.
+3. **Update a MOC?** Update a MOC only when the source changes the topic map:
+   a new concept becomes important, a tension changes, a current judgment needs
+   revision, or an output direction becomes actionable. Ordinary source updates
+   should not churn MOCs.
+4. **Keep as material?** If the source is news, a briefing item, a newsletter
+   issue, or a one-off output with no reusable insight, keep it in `raw/` or
+   `outputs/` and record the skip or idea decision.
 
 ## Tracking State
 
@@ -51,15 +137,55 @@ State is tracked in `wiki/_absorb_log.json`.
 ```json
 "raw/path/to/file.md": {
   "status": "absorbed",
+  "decision": "absorb_now",
+  "observed_at": "2026-04-20T09:58:00Z",
   "absorbed_at": "2026-04-20T10:00:00Z",
   "wiki_pages": ["section/page-name"],
+  "outputs": [],
+  "observed_hash": "sha256:...",
   "hash": "sha256:..."
 }
 ```
 
-Status values: `absorbed` | `skipped_empty` | `skipped_duplicate` | `failed` | `pending`
+Status values: `absorbed` | `skipped_empty` | `skipped_duplicate` |
+`skipped_one_off` | `idea_candidate` | `failed` | `pending`
+
+Decision values: `absorb_now` | `emerge_later` | `raw_only` | `ask_jean`.
+
+`observed_hash` is optional and belongs to capture/observe steps that normalize
+external material before it becomes a raw file. `hash` is the SHA256 of the raw
+file inside the vault and is the required absorb idempotency key. If both are
+present, keep both; do not replace the raw-file hash with an external capture
+hash.
 
 Also append a human-readable entry to `wiki/log.md`.
+
+## Raw Emergence Protocol
+
+Raw emergence is the periodic distillation step between `raw/` and `wiki/`.
+It is used when accumulated source material may contain patterns that are not
+visible from a single file.
+
+Default output path:
+
+```text
+outputs/ideas/YYYY-MM-DD-raw-emergent-themes.md
+```
+
+Rules:
+- Do not write directly to `wiki/` during emergence.
+- Cluster raw sources against active MOC questions, especially
+  `wiki/claude-code/overview.md`, `wiki/harness-engineering/overview.md`, and
+  `wiki/product-trends/overview.md`.
+- Prefer repeated themes across 2+ sources. Single-source observations can be
+  listed as `wait_for_second_source`.
+- Every candidate must cite raw sources and propose one action:
+  `promote_to_concept`, `update_moc`, `keep_in_ideas`,
+  `wait_for_second_source`, `discard_raw_only`, or `ask_jean`.
+- Put all judgment calls under **Pending Jean review**. Emergence may recommend
+  a concept, but it must not mark anything `human_verified`.
+- If a source is clearly one-off, leave it in `raw/` and note why. It does not
+  need a wiki page.
 
 ## Candidate System
 
@@ -88,8 +214,12 @@ Inspired by Foundry's compile workflow. A concept page needs **at least 2 source
 ---
 title: Topic Name
 section: section-name
+page_kind: concept
 sources: 1
 status: candidate
+knowledge_status: ai_draft
+source_type: article
+judgment_owner: ai
 updated: YYYY-MM-DD
 ---
 ```
@@ -100,16 +230,17 @@ For each raw file:
 
 1. **Read the source file fully.**
 2. **Read `CLAUDE.md`** from the vault root for schema and Theme Aggregation Rules.
-3. **Check Theme Aggregation Rules.** If the topic merges into a parent page, note it.
-4. **Determine affected wiki sections** based on content topics and entities.
-5. **Write or update wiki pages** in the most relevant `wiki/<section>/` directory.
+3. **Classify before extracting.** Decide whether the source is one-off material, reference/entity evidence, reusable concept material, durable synthesis, or output material.
+4. **Check Theme Aggregation Rules.** If the topic merges into a parent page, note it.
+5. **Determine affected wiki sections** based on content topics and entities.
+6. **Write or update wiki pages only for durable knowledge** in the most relevant `wiki/<section>/` directory.
    - Use `[[wikilinks]]` for entities, concepts, people, products, organizations.
-   - Add/update frontmatter: `title`, `section`, `sources`, `updated`.
+   - Add/update frontmatter: `title`, `section`, `sources`, `updated`, `page_kind`, `knowledge_status`, `source_type`, `judgment_owner`.
    - If merging into parent: append a new section, update `sources` count.
-6. **Update related entity/concept pages.** Create stubs if missing.
-7. **Update `wiki/index.md`** with links to any new pages.
-8. **Append to `wiki/_absorb_log.json`.**
-9. **Append to `wiki/log.md`:**
+7. **Update related entity/concept/MOC pages.** Create stubs if missing.
+8. **Update `wiki/index.md`** with links to any new pages.
+9. **Append to `wiki/_absorb_log.json`.**
+10. **Append to `wiki/log.md`:**
    ```markdown
    ## [YYYY-MM-DD] ingest | <Source Title>
    Pages touched: [[page1]], [[page2]], ...
@@ -117,6 +248,15 @@ For each raw file:
    Files processed:
    - [[raw/path/to/file.md|Source Title]] → [[wiki/Section/Page]]
    ```
+
+End every ingest/absorb/query write-back with a **Pending Jean review** section
+when AI-drafted knowledge was created or materially changed:
+
+```markdown
+## Pending Jean review
+
+- [[section/page]] — `ai_draft`; suggested action: keep draft / verify / mark hypothesis / dispute / downgrade to output.
+```
 
 ## Classification Rules
 
@@ -175,13 +315,20 @@ updated: YYYY-MM-DD
 
 ### Concept Page Template (for mature pages with 2+ sources)
 
-Use this template when promoting a candidate to mature, or when creating a new page that already has 2+ sources.
+Use this template when promoting a candidate to mature, or when creating a new
+concept page. It is allowed for single-source candidates, but they must keep
+`status: candidate` and `knowledge_status: ai_draft` or `hypothesis`.
 
 ```markdown
 ---
 title: Concept Name
 section: section-name
+page_kind: concept
 sources: 2
+status: mature
+knowledge_status: ai_draft
+source_type: article
+judgment_owner: ai
 updated: YYYY-MM-DD
 ---
 
@@ -246,15 +393,16 @@ Wrong: `` `raw/to-learn/article.md` ``
 
 | Type | Target |
 |------|--------|
-| Overview / theme page | 80-150 lines |
+| Overview / MOC page | 80-180 lines |
 | Standard article | 40-80 lines |
+| Concept page | 40-100 lines |
 | Thin (needs expansion) | <15 lines or <100 words |
 | Crammed (needs split) | >150 lines or >3000 words |
 
 ## Principles
 
 1. You are a **writer**, not a filing clerk.
-2. Every source ends up somewhere. Woven into understanding, not mechanically filed.
+2. Every source is classified and logged. Only reusable insight enters durable wiki pages.
 3. Articles are knowledge, not chronology. Synthesize, don't summarize.
 4. Concept articles are essential. Patterns, themes, frameworks.
 5. Revise your work. Rewrite articles that read like event logs.
