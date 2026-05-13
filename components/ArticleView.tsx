@@ -45,13 +45,14 @@ function renderEvolutionRefs(refs: WikiEvolutionRef[]) {
   return refs.map((ref, index) => {
     const label = ref.title || ref.slug;
     const separator = index > 0 ? ', ' : '';
+    const refKey = `${ref.slug || 'empty'}:${label || 'untitled'}:${index}`;
 
     if (ref.slug.startsWith('raw/')) {
-      return <span key={ref.slug}>{separator}{label}</span>;
+      return <span key={refKey}>{separator}{label}</span>;
     }
 
     return (
-      <span key={ref.slug}>
+      <span key={refKey}>
         {separator}
         <Link className="text-foreground hover:text-primary" href={`/wiki/${ref.slug}`}>
           {label}
@@ -257,8 +258,8 @@ export default function ArticleView({ article, backlinks, semanticTrail, miniGra
         <section className="mt-10 border-t border-border pt-6">
           <h2 className="mb-3 text-lg font-medium text-heading">Linked from</h2>
           <ul className="grid gap-2 sm:grid-cols-2">
-            {backlinks.map((link) => (
-              <li key={link.from}>
+            {backlinks.map((link, index) => (
+              <li key={`${link.from || 'empty'}:${link.label || 'untitled'}:${index}`}>
                 <Link
                   href={`/wiki/${link.from}`}
                   className="block rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground transition-all duration-200 hover:border-primary/30 hover:shadow-sm focus-ring"

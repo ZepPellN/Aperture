@@ -1,0 +1,11 @@
+{
+  "name": "aperture-launch-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.5.7 preview",
+    "check": "npx --yes hyperframes@0.5.7 lint && npx --yes hyperframes@0.5.7 validate --timeout 12000",
+    "snapshot": "npx --yes hyperframes@0.5.7 snapshot . --at 2.2,6.8,11.2,15.8",
+    "render": "npx --yes hyperframes@0.5.7 render --output renders/aperture-launch.mp4"
+  }
+}

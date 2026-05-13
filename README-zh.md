@@ -1,10 +1,50 @@
 <div align="center">
   <h1>Aperture</h1>
-  <p><b>一个 Markdown-first 的 Wiki 与生活系统，将你的笔记转化为可导航的知识图谱。</b></p>
+  <p><b>一个 Markdown-first 的 Wiki、图谱与 Agent 上下文层。</b></p>
   <a href="https://github.com/ZepPellN/Aperture/stargazers"><img src="https://img.shields.io/github/stars/ZepPellN/Aperture?style=flat-square" alt="Stars"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
   <a href="https://x.com/plutozeppln"><img src="https://img.shields.io/badge/follow-@plutozeppln-black?style=flat-square&logo=X" alt="X"></a>
 </div>
+
+Aperture 将本地 Markdown 文件夹编译为可浏览的知识系统：主页、文章页、来源出处、反向链接、图谱、语义聚类、随机漫步、生活仪表盘、JSON API，以及一组可维护 Wiki 的 Agent Skills。
+
+<p align="center">
+  <img src="docs/screenshots/home.png" alt="Aperture dashboard" width="92%">
+</p>
+
+## 功能截图
+
+下方截图使用公开演示数据，不会暴露私人 Vault 内容。
+
+| Wiki 文章 | 知识图谱 |
+|---|---|
+| <img src="docs/screenshots/wiki-article.png" alt="Aperture wiki article with provenance, evolution, and local graph"> | <img src="docs/screenshots/graph.png" alt="Aperture network graph"> |
+| 来源出处、演化历史、反向链接、语义路径，以及每篇文章的局部图谱。 | 多种图谱视图展示链接结构、知识密度、语义布局与 3D 聚类。 |
+
+| 语义路径 | 来源与演化 |
+|---|---|
+| <img src="docs/screenshots/semantic-trail.png" alt="Aperture semantic trail"> | <img src="docs/screenshots/sources-evolution.png" alt="Aperture sources and evolution timeline"> |
+| 不依赖精确关键词，也能沿着语义相近的笔记继续探索。 | 将来源、贡献级别、反向链接与文章演化历史保持可见。 |
+
+| 语义聚类 | 随机漫步 |
+|---|---|
+| <img src="docs/screenshots/clusters.png" alt="Aperture semantic clusters"> | <img src="docs/screenshots/walk.png" alt="Aperture random semantic walk"> |
+| 基于语义嵌入发现知识岛屿。 | 当你不知道该搜索什么时，从一篇文章走向相关概念。 |
+
+| 地形知识图 | 语义认知图 |
+|---|---|
+| <img src="docs/screenshots/topo-map.png" alt="Aperture topographic knowledge map"> | <img src="docs/screenshots/semantic-map.png" alt="Aperture semantic cognitive map"> |
+| 用等高线展示整个 Wiki 的知识密度。 | 用语义布局展示概念之间的距离，而不只依赖直接链接。 |
+
+| Nest Graph | 生活仪表盘 |
+|---|---|
+| <img src="docs/screenshots/nest-graph.png" alt="Aperture 3D nest graph"> | <img src="docs/screenshots/life-dashboard.png" alt="Aperture life dashboard"> |
+| 用 3D 有机聚类展示分类级结构。 | 从 Markdown 中编译每日记录、每周意图、习惯、目标、任务与复盘。 |
+
+| 发布视频 | 静态展示页 |
+|---|---|
+| [观看 18 秒产品视频](docs/hyperframes/aperture-launch/renders/aperture-launch.mp4) | [打开静态展示页](docs/showcase/aperture-showcase.html) |
+| 用 HyperFrames 从 HTML 渲染生成，源文件位于 `docs/hyperframes/aperture-launch/`。 | 使用 README capture 资产制作的独立展示页。 |
 
 ## 你能得到什么
 
@@ -81,6 +121,17 @@ Aperture 为人类和 Agent 同等构建：
 - **`/llms-full.txt`** — 完整的 Agent 可读索引。
 - **捆绑 Skills** — 可安装的 Claude Code skills，用于 Wiki 维护（`wiki-absorb`、`wiki-health`、`wiki-query` 等），位于 `.agents/skills/`。
 
+### Wiki Skills 升级
+
+v0.2 的 Wiki Skills 将 Aperture 从「渲染笔记」推进到「维护一套可复利的知识系统」：
+
+- **Zettelkasten 原子笔记** — 一页承载一个可复用想法，并显式标记成熟度与审核状态。
+- **MOC（Maps of Content）** — 用 overview/MOC 页面维护核心问题、关键概念、主要张力、当前判断、待验证队列与输出方向。
+- **Candidate 机制** — 单一来源的新想法先作为候选概念，不伪装成成熟判断。
+- **来源出处** — 文章页展示来源、贡献度、演化事件与反向链接，让 Agent 带着 caveat 使用知识。
+- **吸收纪律** — 每个 raw source 先分类，再决定更新已有页面、创建原子概念、更新 MOC、保留为 raw，或保存为 output。
+- **Agent-readable surfaces** — `/api/wiki/<slug>`、`/llms.txt`、`/llms-full.txt` 让未来会话先读系统，再开始推理。
+
 ## 页面与路由
 
 | 路由 | 用途 |
@@ -92,6 +143,16 @@ Aperture 为人类和 Agent 同等构建：
 | `/walk` | 语义邻居随机漫步 |
 | `/life` | 个人生活仪表盘 |
 | `/api/wiki/<slug>` | 文章数据的 JSON API |
+
+## 公开 Demo 资产
+
+README 截图使用 `docs/demo-vault/` 下的小型英文 demo vault，避免公开截图暴露私人笔记。运行方式：
+
+```bash
+WIKI_ROOT=$PWD/docs/demo-vault npm run dev
+```
+
+静态展示页在 `docs/showcase/aperture-showcase.html`。HyperFrames 视频项目在 `docs/hyperframes/aperture-launch/`。
 
 ## 设计
 

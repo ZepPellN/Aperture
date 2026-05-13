@@ -1,0 +1,23 @@
+{
+  "workflows/wiki-absorb-loop": [
+    {
+      "date": "2026-05-12",
+      "type": "refined",
+      "title": "Zettelkasten and MOC upgrade",
+      "summary": "Expanded the wiki workflow from source ingestion into an atomic-note and MOC maintenance system.",
+      "from": [{ "slug": "raw/workflows/absorb-loop.md", "title": "Absorb loop notes" }],
+      "to": [{ "slug": "workflows/wiki-absorb-loop", "title": "Wiki Absorb Loop" }],
+      "sources": ["raw/workflows/absorb-loop.md"]
+    }
+  ],
+  "concepts/maps-of-content": [
+    {
+      "date": "2026-05-12",
+      "type": "linked",
+      "title": "Connected MOCs to atomic notes",
+      "summary": "Linked MOC pages to atomic notes so topic maps explain relationships instead of becoming flat indexes.",
+      "from": [{ "slug": "concepts/atomic-notes", "title": "Atomic Notes" }],
+      "to": [{ "slug": "concepts/maps-of-content", "title": "Maps of Content" }]
+    }
+  ]
+}

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aperture Showcase</title>
+    <style>
+      :root {
+        --paper: #faf7f1;
+        --ink: #1f1a14;
+        --muted: #75695e;
+        --line: #e2d8ca;
+        --accent: #c35a21;
+        --green: #4f7b5f;
+        --blue: #54778e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .page {
+        width: min(1180px, calc(100vw - 40px));
+        margin: 0 auto;
+        padding: 56px 0 72px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 44px;
+        align-items: center;
+        min-height: 86vh;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 760px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(58px, 8vw, 118px);
+        line-height: 0.9;
+        font-weight: 400;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        margin: 24px 0 0;
+        max-width: 620px;
+        color: var(--muted);
+        font-size: 20px;
+        line-height: 1.55;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid var(--ink);
+        border-radius: 8px;
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .button.primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: white;
+      }
+
+      .hero-shot {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf4;
+        box-shadow: 0 28px 80px rgba(84, 67, 48, 0.18);
+      }
+
+      .hero-shot img,
+      .shot img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .section {
+        padding: 76px 0 0;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+
+      h2 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(34px, 4vw, 58px);
+        line-height: 1;
+        font-weight: 400;
+      }
+
+      .section-head p {
+        max-width: 430px;
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .shot {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf4;
+      }
+
+      .caption {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .caption strong {
+        color: var(--ink);
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        min-height: 190px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf4;
+      }
+
+      .step span {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .step h3 {
+        margin: 28px 0 10px;
+        font-size: 18px;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 840px) {
+        .hero,
+        .grid,
+        .workflow {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          min-height: auto;
+          padding-bottom: 44px;
+        }
+
+        .section-head {
+          display: block;
+        }
+
+        .section-head p {
+          margin-top: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Markdown-first · Agent-native · Local files</div>
+          <h1>Aperture</h1>
+          <p class="lede">
+            A local wiki viewer that turns a folder of markdown into a navigable knowledge graph with source provenance,
+            semantic trails, MOCs, atomic notes, and APIs built for AI agents.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="../../README.md">Read the README</a>
+            <a class="button" href="../screenshots/home.png">Open screenshots</a>
+          </div>
+        </div>
+        <div class="hero-shot">
+          <img src="../screenshots/home.png" alt="Aperture dashboard showing search, recently updated notes, and categories" />
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>Feature captures</h2>
+          <p>
+            Public demo data, real Aperture UI. These are the images used by the README gallery and launch material.
+          </p>
+        </div>
+        <div class="grid">
+          <figure class="shot">
+            <img src="../screenshots/wiki-article.png" alt="Aperture wiki article page with provenance and local graph" />
+            <figcaption class="caption"><strong>Wiki article</strong><span>Sources · Evolution · Local graph</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/graph.png" alt="Aperture network graph view" />
+            <figcaption class="caption"><strong>Network graph</strong><span>Articles as connected knowledge nodes</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/semantic-trail.png" alt="Aperture semantic trail" />
+            <figcaption class="caption"><strong>Semantic trail</strong><span>Nearby notes without exact keyword search</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/sources-evolution.png" alt="Aperture source provenance and evolution timeline" />
+            <figcaption class="caption"><strong>Sources &amp; evolution</strong><span>Visible provenance and article history</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/topo-map.png" alt="Aperture topographic knowledge map" />
+            <figcaption class="caption"><strong>Topographic map</strong><span>Knowledge density as contour bands</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/semantic-map.png" alt="Aperture cognitive semantic map" />
+            <figcaption class="caption"><strong>Cognitive map</strong><span>Semantic proximity beyond direct links</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/nest-graph.png" alt="Aperture 3D nest graph" />
+            <figcaption class="caption"><strong>Nest graph</strong><span>3D organic clusters by category</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/clusters.png" alt="Aperture semantic clusters page" />
+            <figcaption class="caption"><strong>Semantic clusters</strong><span>Knowledge islands from embeddings</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../screenshots/life-dashboard.png" alt="Aperture life dashboard page" />
+            <figcaption class="caption"><strong>Life dashboard</strong><span>Markdown planning data compiled into one view</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>The loop</h2>
+          <p>Aperture pairs a viewer with skills that help agents keep the vault organized over time.</p>
+        </div>
+        <div class="workflow">
+          <div class="step">
+            <span>01</span>
+            <h3>Capture raw material</h3>
+            <p>Articles, posts, transcripts, tool notes, and briefing files land in plain markdown.</p>
+          </div>
+          <div class="step">
+            <span>02</span>
+            <h3>Absorb into wiki</h3>
+            <p>Skills classify material, update concepts, and avoid turning every source into a standalone page.</p>
+          </div>
+          <div class="step">
+            <span>03</span>
+            <h3>Map durable knowledge</h3>
+            <p>Atomic notes, MOCs, backlinks, source provenance, and evolution metadata keep context navigable.</p>
+          </div>
+          <div class="step">
+            <span>04</span>
+            <h3>Let agents start warm</h3>
+            <p>APIs and llms.txt files let future sessions read the system before reasoning from scratch.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

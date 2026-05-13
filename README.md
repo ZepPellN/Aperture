@@ -1,12 +1,52 @@
 <div align="center">
   <h1>Aperture</h1>
-  <p><b>A markdown-first wiki and life system that turns your notes into a navigable knowledge graph.</b></p>
+  <p><b>A markdown-first wiki, graph, and agent context layer for your local notes.</b></p>
   <a href="https://github.com/ZepPellN/Aperture/stargazers"><img src="https://img.shields.io/github/stars/ZepPellN/Aperture?style=flat-square" alt="Stars"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
   <a href="https://x.com/plutozeppln"><img src="https://img.shields.io/badge/follow-@plutozeppln-black?style=flat-square&logo=X" alt="X"></a>
   <br>
   <a href="README-zh.md">中文</a>
 </div>
+
+Aperture turns a folder of markdown into a browsable knowledge system: homepage, article pages, provenance, backlinks, graph views, semantic clusters, random walks, life dashboard, JSON APIs, and bundled wiki-maintenance skills.
+
+<p align="center">
+  <img src="docs/screenshots/home.png" alt="Aperture dashboard" width="92%">
+</p>
+
+## Feature Gallery
+
+The gallery below uses public demo captures, so the README does not expose private vault content.
+
+| Wiki Article | Network Graph |
+|---|---|
+| <img src="docs/screenshots/wiki-article.png" alt="Aperture wiki article with provenance, evolution, and local graph"> | <img src="docs/screenshots/graph.png" alt="Aperture network graph"> |
+| Sources, evolution history, backlinks, semantic trails, and a floating local graph for each page. | Four graph modes expose link structure, density, semantic layout, and 3D clusters. |
+
+| Semantic Trail | Sources & Evolution |
+|---|---|
+| <img src="docs/screenshots/semantic-trail.png" alt="Aperture semantic trail"> | <img src="docs/screenshots/sources-evolution.png" alt="Aperture sources and evolution timeline"> |
+| Follow semantically adjacent notes without needing exact keywords. | Keep provenance, contribution levels, backlinks, and article history visible. |
+
+| Semantic Clusters | Random Walk |
+|---|---|
+| <img src="docs/screenshots/clusters.png" alt="Aperture semantic clusters"> | <img src="docs/screenshots/walk.png" alt="Aperture random semantic walk"> |
+| DBSCAN over semantic embeddings reveals knowledge islands. | Wander from one page to related concepts when you do not know what to search for. |
+
+| Topographic Map | Cognitive Map |
+|---|---|
+| <img src="docs/screenshots/topo-map.png" alt="Aperture topographic knowledge map"> | <img src="docs/screenshots/semantic-map.png" alt="Aperture semantic cognitive map"> |
+| Knowledge density rendered as a contour map across the wiki. | Semantic layout shows concept proximity beyond direct links. |
+
+| Nest Graph | Life Dashboard |
+|---|---|
+| <img src="docs/screenshots/nest-graph.png" alt="Aperture 3D nest graph"> | <img src="docs/screenshots/life-dashboard.png" alt="Aperture life dashboard"> |
+| A 3D organic cluster view for category-level structure. | Daily journals, weekly intents, habits, goals, tasks, and reviews compiled from markdown. |
+
+| Launch Video | Showcase HTML |
+|---|---|
+| [Watch the 18s product video](docs/hyperframes/aperture-launch/renders/aperture-launch.mp4) | [Open the static showcase](docs/showcase/aperture-showcase.html) |
+| Built from HTML with HyperFrames; source lives in `docs/hyperframes/aperture-launch/`. | A standalone product page using the captured README assets. |
 
 ## What You Get
 
@@ -83,6 +123,17 @@ Aperture is built for agents as much as for humans:
 - **`/llms-full.txt`** — Full agent-readable index.
 - **Bundled skills** — Installable Claude Code skills for wiki maintenance (`wiki-absorb`, `wiki-health`, `wiki-query`, etc.) located in `.agents/skills/`.
 
+### Wiki Skills Upgrade
+
+The v0.2 wiki skills push Aperture from "render my notes" toward "maintain a durable knowledge system":
+
+- **Zettelkasten-style atomic notes** — one durable idea per page, with explicit maturity and review status.
+- **Maps of Content (MOCs)** — living overview pages with core questions, key concepts, tensions, current judgments, verification queues, and output directions.
+- **Candidate workflow** — single-source ideas start as candidates instead of pretending to be mature concepts.
+- **Source provenance** — article pages expose sources, contribution levels, evolution events, and backlinks so agents can reason with caveats.
+- **Absorb discipline** — raw material is classified before writing: update an existing page, create an atomic concept, update a MOC, keep it raw, or save it as output.
+- **Agent-readable surfaces** — `/api/wiki/<slug>`, `/llms.txt`, and `/llms-full.txt` let future sessions start with structured context.
+
 ## Pages & Routes
 
 | Route | Purpose |
@@ -94,6 +145,16 @@ Aperture is built for agents as much as for humans:
 | `/walk` | Random walk through semantic neighbors |
 | `/life` | Personal life dashboard |
 | `/api/wiki/<slug>` | JSON API for article data |
+
+## Public Demo Assets
+
+The README screenshots use a small English demo vault at `docs/demo-vault/` so the public gallery does not expose private notes. Run Aperture against it with:
+
+```bash
+WIKI_ROOT=$PWD/docs/demo-vault npm run dev
+```
+
+The static showcase page is at `docs/showcase/aperture-showcase.html`. The HyperFrames video project is at `docs/hyperframes/aperture-launch/`.
 
 ## Design
 

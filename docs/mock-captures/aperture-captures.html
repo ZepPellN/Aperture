@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aperture Public Capture Mocks</title>
+    <style>
+      :root {
+        --paper: #fbf8f2;
+        --card: #fffdf8;
+        --ink: #24201b;
+        --muted: #80766d;
+        --line: #ded6cb;
+        --line-soft: #ece5dc;
+        --accent: #c84d12;
+        --green: #6d8877;
+        --blue: #7891a8;
+        --tan: #bca98f;
+        --brown: #9b7662;
+        --violet: #9180a8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        min-height: 100%;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      body {
+        overflow: hidden;
+      }
+
+      .capture {
+        display: none;
+        width: 1280px;
+        height: 720px;
+        padding: 34px 42px;
+        background:
+          radial-gradient(circle at 8% 12%, rgba(200, 77, 18, 0.06), transparent 28%),
+          linear-gradient(135deg, #fffaf3 0%, #f8f3eb 100%);
+      }
+
+      .capture.active {
+        display: block;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 400;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: 34px;
+        line-height: 1.08;
+      }
+
+      h2 {
+        font-size: 28px;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .sub {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+
+      .tabs {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255, 253, 248, 0.84);
+      }
+
+      .tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 38px;
+        padding: 0 16px;
+        border-radius: 10px;
+        color: var(--muted);
+        font-weight: 650;
+      }
+
+      .tab.active {
+        background: #e7e0d8;
+        color: var(--ink);
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 253, 248, 0.82);
+        box-shadow: 0 16px 48px rgba(74, 61, 45, 0.08);
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: 1fr 0.92fr;
+        gap: 24px;
+      }
+
+      .hero-card {
+        min-height: 392px;
+        padding: 28px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 34px;
+      }
+
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: white;
+        font-weight: 800;
+      }
+
+      .search {
+        display: flex;
+        align-items: center;
+        min-height: 56px;
+        margin: 28px 0;
+        padding: 0 18px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        color: var(--muted);
+        background: white;
+        font-size: 16px;
+      }
+
+      .stat-row,
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .stat,
+      .tag {
+        border: 1px solid var(--line-soft);
+        border-radius: 12px;
+        background: #fffaf3;
+        padding: 10px 12px;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 22px;
+      }
+
+      .stat span,
+      .tag {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .side-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .list-card {
+        padding: 18px;
+      }
+
+      .list-title {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .note-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 42px;
+        border-top: 1px solid var(--line-soft);
+        font-size: 14px;
+      }
+
+      .note-row:first-of-type {
+        border-top: 0;
+      }
+
+      .note-row span:last-child {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .article {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 26px;
+      }
+
+      .article-main {
+        padding: 30px 34px;
+      }
+
+      .meta {
+        display: flex;
+        gap: 18px;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .section-block {
+        margin-top: 34px;
+      }
+
+      .trail {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .trail-row {
+        display: grid;
+        grid-template-columns: 46px 1fr 72px;
+        align-items: center;
+        min-height: 58px;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+
+      .letter {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        background: #eee8df;
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .letter.hot {
+        background: #f6e7da;
+        color: var(--accent);
+      }
+
+      .small-muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .article-aside {
+        display: grid;
+        gap: 14px;
+      }
+
+      .source-card {
+        padding: 18px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border: 1px solid #f0c7ad;
+        border-radius: 999px;
+        color: var(--accent);
+        background: #fff1e8;
+        font-weight: 700;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .event {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+
+      .map-panel {
+        position: relative;
+        height: 532px;
+        overflow: hidden;
+      }
+
+      .legend {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .density {
+        display: grid;
+        grid-template-columns: repeat(6, 42px);
+        gap: 3px;
+      }
+
+      .density span {
+        height: 13px;
+        background: #ded3c3;
+      }
+
+      .density span:nth-child(2) { background: #d3c6b5; }
+      .density span:nth-child(3) { background: #c8b9a5; }
+      .density span:nth-child(4) { background: #bba98f; }
+      .density span:nth-child(5) { background: #ad9a82; }
+      .density span:nth-child(6) { background: #9f907d; border-radius: 0 5px 5px 0; }
+      .density span:first-child { border-radius: 5px 0 0 5px; }
+
+      .node {
+        position: absolute;
+        width: var(--s, 12px);
+        height: var(--s, 12px);
+        border: 3px solid white;
+        border-radius: 999px;
+        background: var(--c, var(--brown));
+        box-shadow: 0 2px 8px rgba(36, 32, 27, 0.18);
+      }
+
+      .label {
+        position: absolute;
+        min-height: 30px;
+        padding: 5px 10px;
+        border: 1px solid var(--line-soft);
+        border-radius: 10px;
+        background: rgba(255, 253, 248, 0.86);
+        color: #4e463f;
+        font-size: 13px;
+        font-weight: 650;
+        box-shadow: 0 4px 14px rgba(74, 61, 45, 0.08);
+      }
+
+      .clusters-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+      }
+
+      .cluster-card {
+        min-height: 430px;
+        padding: 22px;
+      }
+
+      .cluster-head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .article-chip {
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        margin-top: 10px;
+        padding: 0 14px;
+        border: 1px solid var(--line-soft);
+        border-radius: 13px;
+        background: white;
+        font-weight: 650;
+      }
+
+      .graph-stage {
+        position: relative;
+        height: 535px;
+        overflow: hidden;
+      }
+
+      .edge {
+        position: absolute;
+        height: 1px;
+        background: rgba(133, 124, 112, 0.22);
+        transform-origin: left center;
+      }
+
+      .orbit {
+        position: absolute;
+        width: var(--w);
+        height: var(--h);
+        border: 4px solid rgba(128, 118, 109, 0.11);
+        border-radius: 48%;
+        transform: rotate(var(--r));
+      }
+
+      .orbit.dashed {
+        border-style: dashed;
+      }
+
+      .blob {
+        position: absolute;
+        width: var(--s);
+        height: var(--s);
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--c) 42%, transparent);
+        filter: blur(12px);
+      }
+
+      .nest-cluster {
+        position: absolute;
+        width: var(--s);
+        height: var(--s);
+        border-radius: 50%;
+        background:
+          repeating-radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--c) 48%, white), transparent 2px, transparent 7px),
+          color-mix(in srgb, var(--c) 22%, white);
+        opacity: 0.82;
+      }
+
+      .walk-card,
+      .life-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .walk-card {
+        grid-template-columns: 0.9fr 1.1fr;
+      }
+
+      .walk-step {
+        padding: 18px;
+      }
+
+      .life-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .mini-chart {
+        display: flex;
+        align-items: end;
+        gap: 8px;
+        height: 128px;
+        padding-top: 22px;
+      }
+
+      .bar {
+        flex: 1;
+        height: var(--h);
+        border-radius: 8px 8px 3px 3px;
+        background: var(--c, var(--accent));
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="capture" data-view="home">
+      <div class="dashboard">
+        <div class="panel hero-card">
+          <div class="brand">
+            <div class="mark">A</div>
+            <h1>Aperture</h1>
+          </div>
+          <h1>Browse your agent-readable wiki.</h1>
+          <p class="sub">Markdown in, navigable knowledge graph out. Built for local vaults, source provenance, and AI-agent context.</p>
+          <div class="search">Search articles, concepts, skills, sources...</div>
+          <div class="stat-row">
+            <div class="stat"><strong>428</strong><span>articles</span></div>
+            <div class="stat"><strong>1,942</strong><span>links</span></div>
+            <div class="stat"><strong>36</strong><span>MOCs</span></div>
+            <div class="stat"><strong>9</strong><span>skills</span></div>
+          </div>
+        </div>
+        <div class="side-stack">
+          <div class="panel list-card">
+            <div class="list-title"><span>Recently updated</span><span>Today</span></div>
+            <div class="note-row"><span>Agent Harness Architecture</span><span>6 min</span></div>
+            <div class="note-row"><span>Zettelkasten Operating Loop</span><span>8 min</span></div>
+            <div class="note-row"><span>Maps of Content for AI Work</span><span>4 min</span></div>
+            <div class="note-row"><span>Source-Grounded Synthesis</span><span>7 min</span></div>
+          </div>
+          <div class="panel list-card">
+            <div class="list-title"><span>Knowledge areas</span><span>8</span></div>
+            <div class="tag-row">
+              <span class="tag">AI Ecosystem</span>
+              <span class="tag">Harness Engineering</span>
+              <span class="tag">Product Strategy</span>
+              <span class="tag">Mental Models</span>
+              <span class="tag">Writing</span>
+              <span class="tag">Forecasts</span>
+              <span class="tag">Wiki Skills</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="capture" data-view="article">
+      <div class="article">
+        <main class="panel article-main">
+          <p class="small-muted">Back / Harness Engineering</p>
+          <h1 style="margin-top: 18px; font-size: 52px;">The Agent Harness Pipeline</h1>
+          <div class="meta"><span>Updated 2026-05-12</span><span>7 min read</span><span>1,642 words</span></div>
+          <section class="section-block">
+            <h2>Semantic Trail</h2>
+            <p class="sub">Explore nearby ideas that are semantically close even when they are not directly linked.</p>
+            <div class="trail">
+              <div class="trail-row"><span class="letter hot">A</span><strong>You are here</strong><span></span></div>
+              <div class="trail-row"><span class="letter">B</span><div><span class="small-muted">AI Ecosystem</span><br /><strong>Training Data Feedback Loops</strong></div><span>94%</span></div>
+              <div class="trail-row"><span class="letter">C</span><div><span class="small-muted">Harness Engineering</span><br /><strong>Self-Verification Patterns</strong></div><span>91%</span></div>
+              <div class="trail-row"><span class="letter">D</span><div><span class="small-muted">Product Strategy</span><br /><strong>Agent-Native Workflow Design</strong></div><span>88%</span></div>
+            </div>
+          </section>
+        </main>
+        <aside class="article-aside">
+          <div class="panel source-card">
+            <div class="list-title"><span>Sources</span><span>Synthesized from 3</span></div>
+            <div class="note-row"><span>Agent Harness Field Notes</span><span class="pill">high</span></div>
+            <div class="note-row"><span>Workflow Automation Demand</span><span class="pill">medium</span></div>
+            <div class="note-row"><span>Local Wiki Skill Manual</span><span class="pill">high</span></div>
+          </div>
+          <div class="panel source-card">
+            <div class="list-title"><span>Evolution</span><span>4 events</span></div>
+            <div class="timeline">
+              <div class="event"><strong>absorbed</strong><p class="sub">Derived from source material.</p></div>
+              <div class="event"><strong>refined</strong><p class="sub">Split into atomic notes and linked to MOC.</p></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="capture" data-view="trail">
+      <div class="topbar">
+        <div><p class="small-muted">Back / Harness Engineering</p><h1>The Agent Harness Pipeline</h1><p class="sub">Semantic trails surface nearby notes that are useful for synthesis.</p></div>
+        <div class="tabs"><span class="tab active">Semantic Trail</span><span class="tab">Local Graph</span><span class="tab">Sources</span></div>
+      </div>
+      <div class="panel article-main">
+        <h2>Semantic Trail</h2>
+        <p class="sub">Explore undiscovered paths through your knowledge.</p>
+        <div class="trail">
+          <div class="trail-row"><span class="letter hot">A</span><strong>You are here</strong><span></span></div>
+          <div class="trail-row"><span class="letter">B</span><div><span class="small-muted">AI Ecosystem</span><br /><strong>Training Data Feedback Loops</strong></div><span>94%</span></div>
+          <div class="trail-row"><span class="letter">C</span><div><span class="small-muted">Harness Engineering</span><br /><strong>Self-Verification Patterns for Agents</strong></div><span>91%</span></div>
+          <div class="trail-row"><span class="letter">D</span><div><span class="small-muted">Product Strategy</span><br /><strong>Agent-Native Workflow Design</strong></div><span>88%</span></div>
+          <div class="trail-row"><span class="letter">E</span><div><span class="small-muted">Wiki Skills</span><br /><strong>From Raw Sources to Atomic Notes</strong></div><span>84%</span></div>
+          <div class="trail-row"><span class="letter">F</span><div><span class="small-muted">Mental Models</span><br /><strong>Context as a Renewable Asset</strong></div><span>82%</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="capture" data-view="provenance">
+      <div class="topbar">
+        <div><h1>Sources & Evolution</h1><p class="sub">Every synthesized page keeps its source trail and change history visible.</p></div>
+      </div>
+      <div class="article">
+        <div class="panel source-card">
+          <div class="list-title"><span>Sources</span><span>Synthesized from 3 sources</span></div>
+          <div class="note-row"><span>Agent Harness Field Notes</span><span class="pill">high</span></div>
+          <div class="note-row"><span>Workflow Automation Demand</span><span class="pill">medium</span></div>
+          <div class="note-row"><span>Local Wiki Skill Manual</span><span class="pill">high</span></div>
+        </div>
+        <div class="panel source-card">
+          <div class="list-title"><span>Evolution</span><span>4 events</span></div>
+          <div class="timeline">
+            <div class="event"><strong>2026-05-12 · absorbed</strong><p class="sub">Derived from source material and linked back to the raw notes.</p></div>
+            <div class="event"><strong>2026-05-12 · refined</strong><p class="sub">Split into atomic notes and connected to the Harness Engineering MOC.</p></div>
+            <div class="event"><strong>2026-05-13 · linked</strong><p class="sub">Connected to semantic neighbors for future agent sessions.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel source-card" style="margin-top: 20px;">
+        <div class="list-title"><span>Linked from</span><span>6 backlinks</span></div>
+        <div class="tag-row">
+          <span class="tag">Agent Memory Architecture</span>
+          <span class="tag">Zettelkasten Operating Loop</span>
+          <span class="tag">Skill Boundaries</span>
+          <span class="tag">MOC Design</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="capture" data-view="graph">
+      <div class="topbar">
+        <div><h1>Network Graph</h1><p class="sub">Interactive connections between articles.</p></div>
+        <div class="tabs"><span class="tab active">Network</span><span class="tab">Topo Map</span><span class="tab">Semantic</span><span class="tab">Nest</span></div>
+      </div>
+      <div class="panel graph-stage">
+        <div class="edge" style="left: 305px; top: 240px; width: 470px; transform: rotate(16deg);"></div>
+        <div class="edge" style="left: 278px; top: 386px; width: 570px; transform: rotate(-20deg);"></div>
+        <div class="edge" style="left: 430px; top: 160px; width: 260px; transform: rotate(74deg);"></div>
+        <div class="edge" style="left: 520px; top: 430px; width: 310px; transform: rotate(-58deg);"></div>
+        <div class="edge" style="left: 190px; top: 340px; width: 780px; transform: rotate(1deg);"></div>
+        <div class="blob" style="--s: 260px; --c: var(--brown); left: 430px; top: 210px;"></div>
+        <div class="blob" style="--s: 180px; --c: var(--green); left: 720px; top: 280px;"></div>
+        <div class="blob" style="--s: 150px; --c: var(--blue); left: 320px; top: 310px;"></div>
+        <div class="node" style="left: 526px; top: 330px; --s: 30px; --c: var(--brown);"></div>
+        <div class="node" style="left: 612px; top: 286px; --s: 22px; --c: var(--tan);"></div>
+        <div class="node" style="left: 438px; top: 380px; --s: 20px; --c: var(--blue);"></div>
+        <div class="node" style="left: 755px; top: 366px; --s: 24px; --c: var(--green);"></div>
+        <div class="node" style="left: 842px; top: 274px; --s: 16px; --c: var(--violet);"></div>
+        <div class="label" style="left: 472px; top: 292px;">Agent Harness</div>
+        <div class="label" style="left: 695px; top: 388px;">AI Ecosystem</div>
+        <div class="label" style="left: 318px; top: 356px;">Writing Systems</div>
+        <div class="label" style="left: 608px; top: 218px;">Product Strategy</div>
+      </div>
+    </section>
+
+    <section class="capture" data-view="topo">
+      <div class="topbar">
+        <div><h1>Knowledge Map</h1><p class="sub">Topographic view of knowledge density.</p></div>
+        <div class="tabs"><span class="tab">Network</span><span class="tab active">Topo Map</span><span class="tab">Semantic</span><span class="tab">Nest</span></div>
+      </div>
+      <div class="panel map-panel">
+        <div class="blob" style="--s: 540px; --c: var(--tan); left: 360px; top: 120px;"></div>
+        <div class="blob" style="--s: 280px; --c: var(--green); left: 330px; top: 120px;"></div>
+        <div class="blob" style="--s: 230px; --c: var(--blue); left: 190px; top: 290px;"></div>
+        <div class="orbit" style="--w: 980px; --h: 390px; --r: -3deg; left: 110px; top: 72px;"></div>
+        <div class="orbit dashed" style="--w: 820px; --h: 310px; --r: 4deg; left: 190px; top: 122px;"></div>
+        <div class="orbit" style="--w: 600px; --h: 230px; --r: 6deg; left: 300px; top: 192px;"></div>
+        <div class="label" style="left: 268px; top: 346px;">Writing</div>
+        <div class="label" style="left: 442px; top: 250px;">AI Ecosystem</div>
+        <div class="label" style="left: 570px; top: 360px;">Product Trends</div>
+        <div class="label" style="left: 708px; top: 284px;">AI Tools</div>
+        <div class="label" style="left: 755px; top: 382px;">Claude Code</div>
+        <div class="label" style="left: 462px; top: 448px;">Mental Models</div>
+      </div>
+      <div class="legend"><strong>Knowledge Density</strong><span class="density"><span></span><span></span><span></span><span></span><span></span><span></span></span><span>Sparse → Dense</span></div>
+    </section>
+
+    <section class="capture" data-view="semantic">
+      <div class="topbar">
+        <div><h1>Cognitive Map</h1><p class="sub">Semantic landscape of your knowledge.</p></div>
+        <div class="tabs"><span class="tab">Network</span><span class="tab">Topo Map</span><span class="tab active">Semantic</span><span class="tab">Nest</span></div>
+      </div>
+      <div class="panel map-panel">
+        <div class="blob" style="--s: 430px; --c: var(--green); left: 315px; top: 110px;"></div>
+        <div class="blob" style="--s: 430px; --c: var(--brown); left: 510px; top: 180px;"></div>
+        <div class="blob" style="--s: 250px; --c: var(--blue); left: 180px; top: 302px;"></div>
+        <div class="orbit dashed" style="--w: 920px; --h: 360px; --r: 2deg; left: 150px; top: 98px;"></div>
+        <div class="orbit" style="--w: 690px; --h: 260px; --r: 1deg; left: 270px; top: 190px;"></div>
+        <div class="label" style="left: 260px; top: 350px;">Forecasts</div>
+        <div class="label" style="left: 398px; top: 294px;">AI Ecosystem</div>
+        <div class="label" style="left: 568px; top: 374px;">Product Trends</div>
+        <div class="label" style="left: 716px; top: 304px;">Candidates</div>
+        <div class="label" style="left: 754px; top: 392px;">Harness Engineering</div>
+        <div class="label" style="left: 848px; top: 438px;">Self</div>
+      </div>
+      <div class="legend"><strong>Semantic Density</strong><span class="density"><span></span><span></span><span></span><span></span><span></span><span></span></span><span>Far → Near</span></div>
+    </section>
+
+    <section class="capture" data-view="nest">
+      <div class="topbar">
+        <div><h1>Nest Graph</h1><p class="sub">3D organic cluster of your knowledge.</p></div>
+        <div class="tabs"><span class="tab">Network</span><span class="tab">Topo Map</span><span class="tab">Semantic</span><span class="tab active">Nest</span></div>
+      </div>
+      <div class="panel graph-stage">
+        <div class="edge" style="left: 320px; top: 222px; width: 640px; transform: rotate(28deg);"></div>
+        <div class="edge" style="left: 282px; top: 430px; width: 700px; transform: rotate(-17deg);"></div>
+        <div class="edge" style="left: 490px; top: 126px; width: 260px; transform: rotate(85deg);"></div>
+        <div class="nest-cluster" style="--s: 142px; --c: var(--brown); left: 250px; top: 330px;"></div>
+        <div class="nest-cluster" style="--s: 122px; --c: var(--blue); left: 390px; top: 198px;"></div>
+        <div class="nest-cluster" style="--s: 170px; --c: var(--tan); left: 570px; top: 110px;"></div>
+        <div class="nest-cluster" style="--s: 132px; --c: var(--green); left: 830px; top: 355px;"></div>
+        <div class="nest-cluster" style="--s: 112px; --c: var(--violet); left: 450px; top: 470px;"></div>
+        <div class="label" style="left: 252px; top: 308px;">Mental Models 24</div>
+        <div class="label" style="left: 384px; top: 174px;">Harness Engineering 91</div>
+        <div class="label" style="left: 590px; top: 82px;">AI Tools 48</div>
+        <div class="label" style="left: 884px; top: 338px;">Writing 32</div>
+        <div class="label" style="left: 470px; top: 448px;">Product Trends 73</div>
+      </div>
+    </section>
+
+    <section class="capture" data-view="clusters">
+      <div class="topbar">
+        <div><h1>Knowledge Clusters</h1><p class="sub">Semantic islands discovered across your wiki.</p></div>
+      </div>
+      <div class="clusters-grid">
+        <div class="panel cluster-card">
+          <div class="cluster-head"><span class="pill">Product Trends</span><span class="small-muted">267 articles</span></div>
+          <div class="article-chip">Agent-Native SaaS: Incumbents, Disruption, and Defensibility</div>
+          <div class="article-chip">Enterprise Automation Demand and the Agent-First Future</div>
+          <div class="article-chip">How Open Interfaces Change Software Distribution</div>
+          <div class="article-chip">Executive Second Brain Patterns for Operators</div>
+          <div class="article-chip">Lessons from Building Claude Code Workflows</div>
+          <p class="sub" style="margin-top: 18px;">+262 more articles</p>
+        </div>
+        <div class="panel cluster-card">
+          <div class="cluster-head"><span class="pill">Harness Engineering</span><span class="small-muted">91 articles</span></div>
+          <div class="article-chip">Self-Verification Loops for Long-Running Agents</div>
+          <div class="article-chip">Context Windows as Product Surfaces</div>
+          <div class="article-chip">Skill Boundaries, Tool Contracts, and Memory Hygiene</div>
+          <div class="article-chip">Aperture as a Local Knowledge Interface</div>
+          <div class="article-chip">From Raw Sources to Atomic Notes</div>
+          <p class="sub" style="margin-top: 18px;">View in Graph →</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="capture" data-view="walk">
+      <div class="topbar">
+        <div><h1>Semantic Walk</h1><p class="sub">Move through related ideas without relying on direct backlinks.</p></div>
+      </div>
+      <div class="walk-card">
+        <div class="panel article-main">
+          <p class="small-muted">Current article</p>
+          <h1 style="margin-top: 14px; font-size: 44px;">Maps of Content for Agent Memory</h1>
+          <p class="sub">A MOC works as a navigational surface: it gives agents a stable route through concepts, sources, and project intent.</p>
+        </div>
+        <div class="trail">
+          <div class="panel walk-step"><span class="pill">92%</span><h2>Zettelkasten Operating Loop</h2><p class="sub">Atomic notes stay useful when each note has one job and clear outbound links.</p></div>
+          <div class="panel walk-step"><span class="pill">89%</span><h2>Source Provenance</h2><p class="sub">Every synthesis keeps a visible connection back to its raw inputs.</p></div>
+          <div class="panel walk-step"><span class="pill">86%</span><h2>Wiki Skill Upgrade</h2><p class="sub">Absorb, query, emerge, and reorganize skills maintain the vault over time.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="capture" data-view="life">
+      <div class="topbar">
+        <div><h1>Life Dashboard</h1><p class="sub">Markdown planning data compiled into one private operating view.</p></div>
+      </div>
+      <div class="life-grid">
+        <div class="panel list-card">
+          <div class="list-title"><span>This week's intent</span><span>W19</span></div>
+          <div class="article-chip">Ship Aperture launch assets</div>
+          <div class="article-chip">Write the agent-memory essay</div>
+          <div class="article-chip">Keep daily review lightweight</div>
+        </div>
+        <div class="panel list-card">
+          <div class="list-title"><span>Task velocity</span><span>4 weeks</span></div>
+          <div class="mini-chart">
+            <div class="bar" style="--h: 48px; --c: #d9cbb8;"></div>
+            <div class="bar" style="--h: 96px; --c: var(--accent);"></div>
+            <div class="bar" style="--h: 72px; --c: #d9cbb8;"></div>
+            <div class="bar" style="--h: 118px; --c: var(--accent);"></div>
+          </div>
+        </div>
+        <div class="panel list-card">
+          <div class="list-title"><span>Recent days</span><span>5</span></div>
+          <div class="note-row"><span>Focused build day</span><span>May 12</span></div>
+          <div class="note-row"><span>Research and synthesis</span><span>May 11</span></div>
+          <div class="note-row"><span>Planning reset</span><span>May 10</span></div>
+          <div class="note-row"><span>Writing session</span><span>May 09</span></div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const view = params.get("view") || "home";
+      const target = document.querySelector(`[data-view="${view}"]`) || document.querySelector('[data-view="home"]');
+      target.classList.add("active");
+
+      function seeded(seed) {
+        let value = seed;
+        return () => {
+          value = (value * 9301 + 49297) % 233280;
+          return value / 233280;
+        };
+      }
+
+      const rand = seeded(view.length * 37 + 11);
+      for (const map of document.querySelectorAll(".map-panel, .graph-stage")) {
+        for (let i = 0; i < 180; i++) {
+          const node = document.createElement("span");
+          node.className = "node";
+          const centerX = 600 + (rand() - 0.5) * 520;
+          const centerY = 280 + (rand() - 0.5) * 250;
+          const outlier = rand() > 0.88;
+          const x = outlier ? 70 + rand() * 1060 : centerX;
+          const y = outlier ? 55 + rand() * 420 : centerY;
+          const colors = ["var(--green)", "var(--blue)", "var(--tan)", "var(--brown)", "var(--violet)"];
+          node.style.left = `${x}px`;
+          node.style.top = `${y}px`;
+          node.style.setProperty("--s", `${8 + rand() * 12}px`);
+          node.style.setProperty("--c", colors[Math.floor(rand() * colors.length)]);
+          map.appendChild(node);
+        }
+      }
+    </script>
+  </body>
+</html>

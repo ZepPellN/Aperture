@@ -1,0 +1,26 @@
+{
+  "concepts/source-provenance": [
+    {
+      "source": "raw/captures/source-tracking.md",
+      "contribution": "high",
+      "sections": ["What Aperture tracks", "Why agents need it"],
+      "summary": "Defines the public provenance model used in wiki article pages."
+    }
+  ],
+  "workflows/wiki-absorb-loop": [
+    {
+      "source": "raw/workflows/absorb-loop.md",
+      "contribution": "high",
+      "sections": ["Loop", "Upgrade path"],
+      "summary": "Describes the raw-to-wiki maintenance loop and the Zettelkasten upgrade."
+    }
+  ],
+  "agents/agent-readable-wiki": [
+    {
+      "source": "raw/agents/agent-readable-wiki.md",
+      "contribution": "medium",
+      "sections": ["Aperture surfaces"],
+      "summary": "Lists the API and llms.txt surfaces that help agents start with context."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ComponentType } from 'react';
 import {
   Calendar,
   CheckCircle2,
@@ -99,7 +99,7 @@ interface LifeDashboardProps {
   data: LifeDashboardData;
 }
 
-const areaIcons: Record<string, any> = {
+const areaIcons: Record<string, ComponentType<{ className?: string }>> = {
   health: Heart,
   career: Briefcase,
   photography: Camera,
@@ -121,6 +121,10 @@ const intentCardStyles: Record<string, string> = {
   FORGIVE: 'bg-amber-50/80 border-amber-200/60',
   'SELF-CARE': 'bg-violet-50/80 border-violet-200/60',
 };
+
+function indexedKey(prefix: string, value: string | undefined, index: number) {
+  return `${prefix}:${value || 'empty'}:${index}`;
+}
 
 const intentLabelStyles: Record<string, string> = {
   STOP: 'text-rose-600',
@@ -181,8 +185,8 @@ function HabitHeatmap({ diaries }: { diaries: RecentDiary[] }) {
     <div className="space-y-2">
       <div className="flex items-center gap-1.5">
         <div className="w-20 shrink-0" />
-        {diaries.map((d) => (
-          <div key={d.date} className="flex-1 text-center">
+        {diaries.map((d, index) => (
+          <div key={indexedKey('habit-date', d.date, index)} className="flex-1 text-center">
             <span className="text-[10px] text-muted-foreground tabular-nums">{d.date.slice(5)}</span>
           </div>
         ))}
@@ -192,10 +196,10 @@ function HabitHeatmap({ diaries }: { diaries: RecentDiary[] }) {
           <div className="w-20 shrink-0 text-xs text-muted-foreground truncate" title={habit}>
             {habit}
           </div>
-          {diaries.map((d) => {
+          {diaries.map((d, index) => {
             const done = d.habits?.[habit] ?? false;
             return (
-              <div key={d.date} className="flex-1 flex justify-center">
+              <div key={indexedKey(`habit-${habit}`, d.date, index)} className="flex-1 flex justify-center">
                 <div
                   className={`h-5 w-5 rounded-sm transition-colors duration-200 ${
                     done ? 'bg-primary shadow-sm' : 'bg-muted/50'
@@ -518,8 +522,8 @@ export default function LifeDashboard({ data }: LifeDashboardProps) {
             {data.recentDiaries
               .filter((d) => d.questions && d.questions.length > 0)
               .slice(0, 6)
-              .map((d) => (
-                <div key={d.date} className="rounded-lg border border-border/40 bg-card p-3">
+              .map((d, index) => (
+                <div key={indexedKey('question-day', d.date, index)} className="rounded-lg border border-border/40 bg-card p-3">
                   <div className="text-[10px] font-medium text-muted-foreground mb-1.5 tabular-nums">{d.date}</div>
                   <ul className="space-y-1">
                     {d.questions!.slice(0, 2).map((q, i) => (
@@ -550,8 +554,7 @@ export default function LifeDashboard({ data }: LifeDashboardProps) {
               </div>
               <div className="rounded-xl border border-border/60 bg-card p-4">
                 <div className="flex items-end gap-1.5" style={{ minHeight: '80px' }}>
-                  {data.recentDiaries.slice().reverse().map((d) => {
-                    const hasMood = !!d.dominantEmotion;
+                  {data.recentDiaries.slice().reverse().map((d, index) => {
                     let barColor = 'bg-muted/30';
                     let barH = 'h-2';
                     if (d.dominantEmotion) {
@@ -562,7 +565,7 @@ export default function LifeDashboard({ data }: LifeDashboardProps) {
                       else { barColor = 'bg-amber-400/40'; barH = 'h-10'; }
                     }
                     return (
-                      <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5 justify-end">
+                      <div key={indexedKey('mood-day', d.date, index)} className="flex-1 flex flex-col items-center gap-1.5 justify-end">
                         <div className="flex flex-col items-center gap-1">
                           {d.energyLevel !== undefined && (
                             <span className="text-[10px] font-medium text-muted-foreground tabular-nums">{d.energyLevel}</span>
@@ -629,11 +632,11 @@ export default function LifeDashboard({ data }: LifeDashboardProps) {
                     </div>
                     {/* Bar chart */}
                     <div className="flex items-end gap-4" style={{ minHeight: '80px' }}>
-                      {ordered.map((t) => {
+                      {ordered.map((t, index) => {
                         const pendingH = t.pendingCount > 0 ? Math.max(4, (t.pendingCount / maxVal) * 70) : 0;
                         const completedH = t.completedCount > 0 ? Math.max(4, (t.completedCount / maxVal) * 70) : 0;
                         return (
-                          <div key={t.week} className="flex-1 flex flex-col items-center gap-0">
+                          <div key={indexedKey('task-week', t.week, index)} className="flex-1 flex flex-col items-center gap-0">
                             {/* Bars container — labels sit on top of bars */}
                             <div className="flex items-end gap-1" style={{ height: '80px' }}>
                               {/* Pending bar + label */}
@@ -681,14 +684,15 @@ export default function LifeDashboard({ data }: LifeDashboardProps) {
             </div>
             <div className="divide-y divide-border/40 rounded-xl border border-border/60 bg-card">
               {data.recentDiaries.slice(0, 5).map((d, i) => {
-                const isExpanded = expandedDiary === d.date;
+                const diaryKey = indexedKey('recent-day', d.date, i);
+                const isExpanded = expandedDiary === diaryKey;
                 return (
-                  <div key={d.date}>
+                  <div key={diaryKey}>
                     <div
                       className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors hover:bg-secondary/20 ${
                         i === 0 ? 'rounded-t-xl' : ''
                       } ${i === Math.min(data.recentDiaries.length, 5) - 1 && !isExpanded ? 'rounded-b-xl' : ''}`}
-                      onClick={() => setExpandedDiary(isExpanded ? null : d.date)}
+                      onClick={() => setExpandedDiary(isExpanded ? null : diaryKey)}
                     >
                       <div className="flex h-7 shrink-0 items-center justify-center rounded-md bg-secondary px-2 text-xs font-medium tabular-nums min-w-[3.2rem]">
                         {d.date.slice(5)}
@@ -882,10 +886,12 @@ export default function LifeDashboard({ data }: LifeDashboardProps) {
               <section className="space-y-3">
                 <h2 className="font-serif text-lg font-normal tracking-tight text-heading">Weekly Reviews</h2>
                 <div className="space-y-2">
-                  {data.recentReviews.map((r) => (
-                    <div key={r.week} className="rounded-lg border border-border/60 bg-card overflow-hidden">
+                  {data.recentReviews.map((r, index) => {
+                    const reviewKey = indexedKey('review-week', r.week, index);
+                    return (
+                    <div key={reviewKey} className="rounded-lg border border-border/60 bg-card overflow-hidden">
                       <button
-                        onClick={() => setExpandedReview(expandedReview === r.week ? null : r.week)}
+                        onClick={() => setExpandedReview(expandedReview === reviewKey ? null : reviewKey)}
                         className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-secondary/20"
                       >
                         <div>
@@ -897,20 +903,21 @@ export default function LifeDashboard({ data }: LifeDashboardProps) {
                             <span className="flex items-center gap-1"><Activity className="h-3 w-3" />{r.buildingDays}d</span>
                             <span className="flex items-center gap-1"><Lightbulb className="h-3 w-3" />{r.ideasCount}</span>
                           </div>
-                          {expandedReview === r.week ? (
+                          {expandedReview === reviewKey ? (
                             <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
                           ) : (
                             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                           )}
                         </div>
                       </button>
-                      {expandedReview === r.week && r.contentHtml && (
+                      {expandedReview === reviewKey && r.contentHtml && (
                         <div className="border-t border-border/40 px-4 py-4">
                           <div className="wiki-article text-sm" dangerouslySetInnerHTML={{ __html: r.contentHtml }} />
                         </div>
                       )}
                     </div>
-                  ))}
+                  );
+                  })}
                   {data.recentReviews.length === 0 && (
                     <div className="rounded-lg border border-border/60 bg-card p-3 text-xs text-muted-foreground">
                       No weekly reviews yet. Run{' '}

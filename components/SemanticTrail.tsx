@@ -16,7 +16,7 @@ interface SemanticTrailProps {
   trail: TrailNode[];
 }
 
-export default function SemanticTrail({ currentSlug, trail }: SemanticTrailProps) {
+export default function SemanticTrail({ trail }: SemanticTrailProps) {
   if (trail.length === 0) return null;
 
   return (
@@ -42,7 +42,7 @@ export default function SemanticTrail({ currentSlug, trail }: SemanticTrailProps
 
         {/* Trail nodes */}
         {trail.map((node, i) => (
-          <div key={node.slug} className="flex items-center gap-3">
+          <div key={`${node.slug || 'empty'}:${node.title || 'untitled'}:${i}`} className="flex items-center gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
               {String.fromCharCode(66 + i)}
             </div>
